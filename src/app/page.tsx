@@ -6,34 +6,30 @@ import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-white text-gray-800 overflow-hidden flex flex-col items-center justify-center">
-      {/* Stronger animated background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-100 via-white to-white opacity-90 -z-10" />
+    <main className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-800 text-gray-100 overflow-hidden flex flex-col items-center justify-center">
+      {/* Animated background shapes */}
       <AnimatedBackground />
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative text-center px-6 mt-24 md:mt-28 max-w-3xl">
+      <section className="relative text-center px-6 mt-16 md:mt-20 max-w-3xl">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-5xl md:text-6xl font-extrabold text-blue-700 leading-tight"
+          className="text-5xl md:text-6xl font-extrabold leading-tight"
         >
           Empowering the Future of{" "}
           <motion.span
-            className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-800"
+            className="text-blue-500"
             animate={{
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              opacity: [1, 0.5, 1],
             }}
             transition={{
-              duration: 6,
+              duration: 1.8,
               repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              backgroundSize: "200% 200%",
+              ease: "easeInOut",
             }}
           >
             Academic Excellence
@@ -45,7 +41,7 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="mt-5 text-lg text-gray-600 leading-relaxed"
+          className="mt-5 text-lg text-gray-300 leading-relaxed"
         >
           AcadeX is your all-in-one academic platform — designed for schools,
           teachers, and students. Conduct exams, manage results, and analyze
@@ -67,7 +63,7 @@ export default function Home() {
           </a>
           <a
             href="#demo"
-            className="px-8 py-4 border border-blue-600 text-blue-600 font-semibold rounded-full hover:bg-blue-50 transition"
+            className="px-8 py-4 border border-blue-600 text-blue-400 font-semibold rounded-full hover:bg-blue-900/30 transition"
           >
             Watch Demo
           </a>
