@@ -1,103 +1,161 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="bg-white text-gray-900 min-h-screen overflow-x-hidden">
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center text-center px-6 py-24 sm:py-32 bg-gradient-to-b from-blue-50 to-white">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-4xl sm:text-6xl font-bold mb-6"
+        >
+          Welcome to <span className="text-blue-600">AcadeX</span>
+        </motion.h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.8 }}
+          className="max-w-2xl text-gray-600 text-lg mb-8"
+        >
+          A powerful, lightweight academic management system designed for schools,
+          exam officers, and students — online or offline.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="flex gap-4"
+        >
+          <Link
+            href="#portals"
+            className="bg-blue-600 text-white px-6 py-3 rounded-full flex items-center gap-2 hover:bg-blue-700 transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Explore Portals <ArrowRight className="w-5 h-5" />
+          </Link>
+          <Link
+            href="#about"
+            className="border border-blue-600 text-blue-600 px-6 py-3 rounded-full hover:bg-blue-50 transition"
           >
-            Read our docs
-          </a>
+            Learn More
+          </Link>
+        </motion.div>
+      </section>
+
+      {/* About / How It Works */}
+      <section
+        id="about"
+        className="py-24 bg-white text-center px-6 max-w-5xl mx-auto"
+      >
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl font-semibold mb-8"
+        >
+          How <span className="text-blue-600">AcadeX</span> Works
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-gray-600 max-w-3xl mx-auto text-lg"
+        >
+          AcadeX connects super admins, schools, and students under one
+          platform. Each school manages its operations while the central AcadeX
+          hub ensures secure synchronization, real-time reporting, and
+          customizable branding.
+        </motion.p>
+      </section>
+
+      {/* Portal Cards */}
+      <section
+        id="portals"
+        className="py-24 bg-blue-50 text-center px-6"
+      >
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl font-semibold mb-12"
+        >
+          Choose Your Portal
+        </motion.h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {[
+            {
+              title: "Super Admin",
+              desc: "Manage all schools, monitor performance, and control system settings centrally.",
+              color: "bg-blue-600",
+              href: "/super-admin",
+            },
+            {
+              title: "School Admin",
+              desc: "Handle admissions, exams, results, and student records efficiently.",
+              color: "bg-white border border-blue-200",
+              href: "/school-admin",
+            },
+            {
+              title: "Student Portal",
+              desc: "Access exams, results, and personal data on web or mobile seamlessly.",
+              color: "bg-blue-600",
+              href: "/student",
+            },
+          ].map((portal, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05 }}
+              className={`${portal.color} rounded-2xl shadow-md p-8 text-left flex flex-col justify-between transition`}
+            >
+              <h3
+                className={`text-2xl font-semibold mb-4 ${
+                  portal.color.includes("bg-blue-600")
+                    ? "text-white"
+                    : "text-blue-700"
+                }`}
+              >
+                {portal.title}
+              </h3>
+              <p
+                className={`mb-6 ${
+                  portal.color.includes("bg-blue-600")
+                    ? "text-blue-100"
+                    : "text-gray-600"
+                }`}
+              >
+                {portal.desc}
+              </p>
+              <Link
+                href={portal.href}
+                className={`px-5 py-2 rounded-full font-medium text-center ${
+                  portal.color.includes("bg-blue-600")
+                    ? "bg-white text-blue-600 hover:bg-blue-50"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+              >
+                Go to Portal
+              </Link>
+            </motion.div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-10 text-center text-gray-500 text-sm border-t border-gray-100">
+        <p>
+          © {new Date().getFullYear()} <span className="text-blue-600 font-medium">AcadeX</span>.
+          All rights reserved.
+        </p>
       </footer>
-    </div>
+    </main>
   );
 }
