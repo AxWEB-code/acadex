@@ -47,11 +47,11 @@ export default function FloatingIcons() {
           key={i}
           initial={{ opacity: 0, y: 0 }}
           animate={{
-            opacity: [0.2, 0.7, 0.2],
+            opacity: [0.15, 0.6, 0.15],
             y: [0, -25, 0],
           }}
           transition={{
-            duration: 5 + (i % 3), // small variations in speed
+            duration: 5 + (i % 3),
             delay,
             repeat: Infinity,
             ease: "easeInOut",
@@ -62,7 +62,22 @@ export default function FloatingIcons() {
             top: `calc(50% + ${y})`,
           }}
         >
-          <Icon size={90} strokeWidth={1.2} />
+          {/* Responsive icon sizes */}
+          <Icon
+            className="hidden sm:block md:hidden"
+            size={60}
+            strokeWidth={1.2}
+          />
+          <Icon
+            className="hidden md:block"
+            size={90}
+            strokeWidth={1.2}
+          />
+          <Icon
+            className="block sm:hidden"
+            size={45}
+            strokeWidth={1.1}
+          />
         </motion.div>
       ))}
     </div>
