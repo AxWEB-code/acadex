@@ -7,15 +7,18 @@ import Navbar from "@/components/Navbar";
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-white text-gray-800 overflow-hidden flex flex-col items-center justify-center">
+      {/* Stronger animated background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-100 via-white to-white opacity-90 -z-10" />
       <AnimatedBackground />
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative text-center px-6 mt-32 md:mt-40 max-w-3xl">
+      <section className="relative text-center px-6 mt-24 md:mt-28 max-w-3xl">
         <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
           className="text-5xl md:text-6xl font-extrabold text-blue-700 leading-tight"
         >
           Empowering the Future of{" "}
@@ -25,9 +28,12 @@ export default function Home() {
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
             transition={{
-              duration: 5,
+              duration: 6,
               repeat: Infinity,
               ease: "linear",
+            }}
+            style={{
+              backgroundSize: "200% 200%",
             }}
           >
             Academic Excellence
@@ -35,21 +41,23 @@ export default function Home() {
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="mt-6 text-lg text-gray-600 leading-relaxed"
+          className="mt-5 text-lg text-gray-600 leading-relaxed"
         >
           AcadeX is your all-in-one academic platform — designed for schools,
           teachers, and students. Conduct exams, manage results, and analyze
-          performance online or offline — efficiently and securely.
+          performance both online and offline — efficiently and securely.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
           transition={{ delay: 0.6, duration: 0.7 }}
-          className="mt-10 flex justify-center gap-4"
+          className="mt-8 flex justify-center gap-4"
         >
           <a
             href="#get-started"
