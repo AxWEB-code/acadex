@@ -4,37 +4,36 @@ import { motion } from "framer-motion";
 
 export default function AnimatedBackground() {
   return (
-    <div className="absolute inset-0 overflow-hidden -z-10">
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B1120] via-[#0E162B] to-[#0B1120]" />
+    <div className="absolute inset-0 overflow-hidden -z-20">
+      {/* Dark gradient base */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07101b] via-[#0b1220] to-[#07101b]" />
 
-      {/* Floating blue glows */}
+      {/* Left glow */}
       <motion.div
-        className="absolute top-[10%] left-[-10%] w-[400px] h-[400px] bg-blue-700/40 rounded-full mix-blend-screen filter blur-[150px]"
+        aria-hidden
+        className="absolute top-[6%] left-[-12%] w-[420px] h-[420px] rounded-full mix-blend-screen"
+        style={{ background: "linear-gradient(180deg,#0ea5e9, #0369a1)" }}
         animate={{
-          x: [0, 40, 0],
-          y: [0, 30, 0],
-          scale: [1, 1.05, 1],
+          x: [0, 48, 0],
+          y: [0, 28, 0],
+          scale: [1, 1.04, 1],
+          opacity: [0.45, 0.65, 0.45],
         }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          repeatType: "mirror",
-        }}
+        transition={{ duration: 16, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
       />
 
+      {/* Right glow */}
       <motion.div
-        className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-500/30 rounded-full mix-blend-screen filter blur-[180px]"
+        aria-hidden
+        className="absolute bottom-[-12%] right-[-10%] w-[520px] h-[520px] rounded-full mix-blend-screen"
+        style={{ background: "linear-gradient(180deg,#7dd3fc, #0369a1)" }}
         animate={{
-          x: [0, -50, 0],
+          x: [0, -60, 0],
           y: [0, -40, 0],
-          scale: [1, 1.08, 1],
+          scale: [1, 1.07, 1],
+          opacity: [0.28, 0.5, 0.28],
         }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          repeatType: "mirror",
-        }}
+        transition={{ duration: 18, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
       />
     </div>
   );
