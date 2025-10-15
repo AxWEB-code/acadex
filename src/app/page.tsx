@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
+import FloatingIcons from "@/components/FloatingIcons";
+
 
 export default function Home() {
   return (
@@ -10,6 +12,11 @@ export default function Home() {
       {/* Animated background shapes */}
       <AnimatedBackground />
       <Navbar />
+
+    <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a] to-[#0f172a] opacity-90 -z-10" />
+  <AnimatedBackground />
+  <FloatingIcons />  {/* 🧠 Add this here */}
+
 
       {/* Hero Section */}
       <section className="relative text-center px-6 mt-16 md:mt-20 max-w-3xl">
