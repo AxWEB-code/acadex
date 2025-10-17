@@ -65,12 +65,12 @@ export default function FloatingIcons() {
           {/* Responsive icon sizes */}
           <Icon
             className="hidden sm:block md:hidden"
-            size={60}
+            size={50}
             strokeWidth={1.2}
           />
           <Icon
             className="hidden md:block"
-            size={90}
+            size={80}
             strokeWidth={1.2}
           />
           <Icon

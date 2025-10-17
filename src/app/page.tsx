@@ -68,12 +68,15 @@ export default function Home() {
           >
             Get Started
           </a>
-          <a
-            href="#demo"
+          <button
+            onClick={() => {
+              const aboutSection = document.getElementById("about");
+              aboutSection?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="px-8 py-4 border border-blue-600 text-blue-400 font-semibold rounded-full hover:bg-blue-900/30 transition"
           >
-            Watch Demo
-          </a>
+            Learn More
+          </button>
         </motion.div>
       </section>
     </main>
