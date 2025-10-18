@@ -16,7 +16,6 @@ export default function Home() {
       <FloatingIcons />
 
       {/* 🎯 HERO SECTION */}
-      {/* <- only change: added negative bottom margin to reduce space below hero */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 max-w-3xl mx-auto mb-[-48px] md:mb-[-72px]">
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
@@ -46,9 +45,8 @@ export default function Home() {
           viewport={{ once: true }}
           className="mt-5 text-lg text-gray-300 leading-relaxed"
         >
-          AcadeX is your all-in-one academic platform built for schools, 
-          teachers, and students. Manage digital exams, compute results 
-          instantly, and keep records safe — online or offline. 
+          AcadeX is your all-in-one academic platform built for schools, teachers, and students. 
+          Manage digital exams, compute results instantly, and keep records safe — online or offline.
           <br />
           <span className="text-blue-400">
             Simple, Secure, and Smart — the future of academic testing starts here.
@@ -69,23 +67,30 @@ export default function Home() {
             Get Started
           </a>
 
+          {/* ✅ Fixed button */}
           <button
-            onClick={() => {
-              const aboutSection = document.getElementById("about");
-              aboutSection?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="px-8 py-4 border border-blue-600 text-blue-400 font-semibold rounded-full hover:bg-blue-900/30 transition"
-          >
-            Learn More
-          </button>
+  onClick={() => {
+    const aboutSection = document.getElementById("about");
+    if (aboutSection) {
+      const navbarHeight = window.innerWidth >= 768 ? 100 : 70; // larger offset for desktop
+      const top =
+        aboutSection.getBoundingClientRect().top + window.scrollY - navbarHeight;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  }}
+  className="px-8 py-4 border border-white text-white font-semibold rounded-full hover:bg-white/10 transition"
+>
+  Learn More
+</button>
+
         </motion.div>
       </section>
 
       {/* 🌟 WHY CHOOSE ACADEX SECTION */}
       <section
-  id="about"
-  className="py-16 md:py-24 w-full bg-gray-900/50 text-center -mt-10 md:-mt-20 relative z-10"
->
+        id="about"
+        className="pt-8 md:pt-12 pb-20 w-full bg-gray-900/50 text-center -mt-4 md:-mt-8 relative z-10"
+      >
         <WhyChooseAcadeX />
       </section>
     </main>
