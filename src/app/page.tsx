@@ -82,7 +82,10 @@ export default function Home() {
       </section>
 
       {/* 🌟 WHY CHOOSE ACADEX SECTION */}
-      <section id="about" className="py-20 w-full bg-gray-900/50 text-center">
+      <section
+  id="about"
+  className="py-16 md:py-24 w-full bg-gray-900/50 text-center -mt-10 md:-mt-20 relative z-10"
+>
         <WhyChooseAcadeX />
       </section>
     </main>
