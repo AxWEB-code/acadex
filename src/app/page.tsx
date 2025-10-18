@@ -16,7 +16,8 @@ export default function Home() {
       <FloatingIcons />
 
       {/* 🎯 HERO SECTION */}
-      <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 max-w-3xl mx-auto">
+      {/* <- only change: added negative bottom margin to reduce space below hero */}
+      <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 max-w-3xl mx-auto mb-[-48px] md:mb-[-72px]">
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -81,7 +82,7 @@ export default function Home() {
       </section>
 
       {/* 🌟 WHY CHOOSE ACADEX SECTION */}
-      <section id="about" className="py-24 w-full bg-gray-900/50 text-center">
+      <section id="about" className="py-20 w-full bg-gray-900/50 text-center">
         <WhyChooseAcadeX />
       </section>
     </main>
