@@ -37,19 +37,8 @@ const features = [
   },
 ];
 
-export default function WhyChooseAcadeX() {
-  const controls = useAnimation();
-  const [ref, inView] = useInView({ threshold: 0.2, triggerOnce: false });
-
-  useEffect(() => {
-    if (inView) controls.start("visible");
-    else controls.start("hidden");
-  }, [inView, controls]);
-
-  // ✅ fixed fadeLift definition
-  import { Variants } from "framer-motion";
-
-const variants: Variants = {
+// ✅ Correct fadeLift definition
+const fadeLift = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
   visible: (custom: number = 0) => ({
     opacity: 1,
@@ -63,6 +52,14 @@ const variants: Variants = {
   }),
 };
 
+export default function WhyChooseAcadeX() {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({ threshold: 0.2, triggerOnce: false });
+
+  useEffect(() => {
+    if (inView) controls.start("visible");
+    else controls.start("hidden");
+  }, [inView, controls]);
 
   return (
     <div ref={ref} className="relative max-w-6xl mx-auto px-6 py-20">
@@ -126,7 +123,7 @@ const variants: Variants = {
             initial="hidden"
             animate={controls}
             variants={fadeLift}
-            className="relative bg-gray-800/60 p-6 rounded-2xl shadow-lg border border-gray-700 transition-all"
+            className="relative bg-gray-800/60 p-6 rounded-2xl shadow-lg border border-gray-700 hover:bg-gray-800/80 transition-all hover:shadow-[0_0_15px_rgba(59,130,246,0.35)]"
           >
             <div className="flex flex-col items-center text-center space-y-3 relative z-10">
               <div className="relative">{f.icon}</div>
