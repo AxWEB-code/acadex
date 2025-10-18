@@ -46,6 +46,7 @@ export default function WhyChooseAcadeX() {
     else controls.start("hidden");
   }, [inView, controls]);
 
+  // ✅ fixed fadeLift definition
   const fadeLift = {
     hidden: { opacity: 0, y: 40, scale: 0.95 },
     visible: (i: number) => ({
@@ -122,7 +123,7 @@ export default function WhyChooseAcadeX() {
             initial="hidden"
             animate={controls}
             variants={fadeLift}
-            className="relative bg-gray-800/60 p-6 rounded-2xl shadow-lg border border-gray-700 hover:bg-gray-800/80 transition-all hover:shadow-[0_0_15px_rgba(59,130,246,0.35)]"
+            className="relative bg-gray-800/60 p-6 rounded-2xl shadow-lg border border-gray-700 transition-all"
           >
             <div className="flex flex-col items-center text-center space-y-3 relative z-10">
               <div className="relative">{f.icon}</div>
