@@ -47,19 +47,22 @@ export default function WhyChooseAcadeX() {
   }, [inView, controls]);
 
   // ✅ fixed fadeLift definition
-  const fadeLift = {
-    hidden: { opacity: 0, y: 40, scale: 0.95 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        delay: i * 0.15,
-        duration: 0.8,
-        ease: "easeInOut",
-      },
-    }),
-  };
+  import { Variants } from "framer-motion";
+
+const variants: Variants = {
+  hidden: { opacity: 0, y: 50, scale: 0.95 },
+  visible: (custom: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: custom * 0.2,
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  }),
+};
+
 
   return (
     <div ref={ref} className="relative max-w-6xl mx-auto px-6 py-20">
