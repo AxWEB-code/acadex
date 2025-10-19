@@ -46,7 +46,7 @@ const fadeLift = {
     transition: {
       delay: custom * 0.2,
       duration: 0.6,
-      ease: "easeOut" as const, // Add 'as const' to be more specific
+      ease: "easeOut", // Use string easing name instead of number array
     },
   }),
 };
