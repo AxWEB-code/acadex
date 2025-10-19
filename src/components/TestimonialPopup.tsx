@@ -22,7 +22,7 @@ const testimonials = [
     author: "Mr. Emmanuel Eze",
   },
   {
-    message: "AcadeX is bridging Africa’s digital learning divide beautifully.",
+    message: "AcadeX is bridging Africa's digital learning divide beautifully.",
     author: "Michael Johnson",
   },
   {
@@ -40,7 +40,8 @@ const testimonials = [
 ];
 
 export default function TestimonialPopup() {
-  const typedRef = useRef<HTMLSpanElement>(null);
+  // FIX: Changed HTMLSpanElement to HTMLParagraphElement
+  const typedRef = useRef<HTMLParagraphElement>(null);
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
   const [position, setPosition] = useState("bottom-right");
@@ -61,7 +62,7 @@ export default function TestimonialPopup() {
 
     const typed = new Typed(typedRef.current!, {
       strings: [
-        `“${testimonials[index].message}” <br><span class='text-blue-400 text-xs sm:text-sm'>${testimonials[index].author}</span>`,
+        `"${testimonials[index].message}" <br><span class='text-blue-400 text-xs sm:text-sm'>${testimonials[index].author}</span>`,
       ],
       typeSpeed: 30,
       showCursor: false,
