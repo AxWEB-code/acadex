@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
 import FloatingIcons from "@/components/FloatingIcons";
-import WhyChooseAcadeX from "@/components/WhyChooseAcadeX"; // ✳️ new section
+import WhyChooseAcadeX from "@/components/WhyChooseAcadeX"; 
+import TestimonialPopup from "@/components/TestimonialPopup";
 
 export default function Home() {
   return (
@@ -92,7 +93,10 @@ export default function Home() {
         className="pt-8 md:pt-12 pb-20 w-full bg-gray-900/50 text-center -mt-4 md:-mt-8 relative z-10"
       >
         <WhyChooseAcadeX />
+        <TestimonialPopup />
       </section>
+
+      
     </main>
   );
 }

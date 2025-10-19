@@ -10,12 +10,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   const navLinks = [
-    { name: "Home", href: "#home" },
-    { name: "Features", href: "#features" },
-    { name: "How It Works", href: "#how-it-works" },
-    { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" },
-  ];
+  { name: "Home", href: "#home" },
+  { name: "Features", href: "#features" },
+  { name: "How It Works", href: "#how-it-works" },
+  { name: "Contact", href: "#contact" },
+  { name: "Portal", href: "#portal" }, 
+  
+];
 
   useEffect(() => {
     const onScroll = () => {

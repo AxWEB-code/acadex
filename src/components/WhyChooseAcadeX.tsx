@@ -46,7 +46,7 @@ const fadeLift = {
     transition: {
       delay: custom * 0.2,
       duration: 0.6,
-      ease: "easeOut" as const, // Add 'as const' to fix TypeScript
+      ease: "easeOut" as const, 
     },
   }),
 };
@@ -145,7 +145,7 @@ export default function WhyChooseAcadeX() {
       >
         <div className="flex items-center gap-2 bg-white/2 px-3 py-2 rounded-lg border border-white/5">
           <GraduationCap size={16} className="text-blue-400" />
-          <span>Trusted by 10+ Schools</span>
+          <span>Trusted by 50+ Schools</span>
         </div>
 
         <div className="flex items-center gap-2 bg-white/2 px-3 py-2 rounded-lg border border-white/5">
@@ -205,9 +205,7 @@ export default function WhyChooseAcadeX() {
         }}
         className="text-center mt-14"
       >
-        <button className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-medium shadow-md transition-all hover:shadow-[0_0_18px_rgba(59,130,246,0.4)]">
-          Get Started with AcadeX
-        </button>
+      
       </motion.div>
     </div>
   );
