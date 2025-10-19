@@ -37,7 +37,6 @@ const features = [
   },
 ];
 
-// Alternative: Use string easing names
 const fadeLift = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
   visible: (custom: number = 0) => ({
@@ -47,7 +46,7 @@ const fadeLift = {
     transition: {
       delay: custom * 0.2,
       duration: 0.6,
-      ease: "easeOut", // Use string easing name
+      ease: "easeOut" as const, // Add 'as const' to be more specific
     },
   }),
 };
