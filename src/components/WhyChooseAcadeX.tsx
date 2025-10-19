@@ -37,7 +37,7 @@ const features = [
   },
 ];
 
-// ✅ Correct fadeLift definition
+// Alternative: Use string easing names
 const fadeLift = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
   visible: (custom: number = 0) => ({
@@ -47,7 +47,7 @@ const fadeLift = {
     transition: {
       delay: custom * 0.2,
       duration: 0.6,
-      ease: "easeOut",
+      ease: "easeOut", // Use string easing name
     },
   }),
 };
