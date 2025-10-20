@@ -70,19 +70,19 @@ export default function Home() {
     </a>
 
     <button
-      onClick={() => {
-        const aboutSection = document.getElementById("about");
-        if (aboutSection) {
-          const navbarHeight = window.innerWidth >= 768 ? 100 : 70;
-          const top =
-            aboutSection.getBoundingClientRect().top + window.scrollY - navbarHeight;
-          window.scrollTo({ top, behavior: "smooth" });
-        }
-      }}
-      className="px-8 py-4 border border-white text-white font-semibold rounded-full hover:bg-white/10 transition"
-    >
-      Learn More
-    </button>
+  onClick={() => {
+    const wcaHeading = document.getElementById("wca-heading");
+    if (wcaHeading) {
+      const navbarHeight = window.innerWidth >= 768 ? 100 : 70; // adjust for fixed navbar
+      const top = wcaHeading.getBoundingClientRect().top + window.scrollY - navbarHeight;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  }}
+  className="px-8 py-4 border border-white text-white font-semibold rounded-full hover:bg-white/10 transition"
+>
+  Learn More
+</button>
+
   </motion.div>
 </section>
 
