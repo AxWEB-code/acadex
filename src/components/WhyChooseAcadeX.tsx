@@ -59,7 +59,7 @@ export default function WhyChooseAcadeX() {
   }, [controls]);
 
   return (
-    <div className="relative max-w-6xl mx-auto px-6 py-16">
+    <div className="relative max-w-6xl mx-auto px-5 py-2">
       {/* ✨ Subtle Animated Background Glow */}
       <motion.div
         className="absolute inset-0 -z-10 blur-3xl opacity-30"
