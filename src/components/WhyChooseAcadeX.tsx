@@ -53,12 +53,13 @@ const fadeLift = {
 export default function WhyChooseAcadeX() {
   const controls = useAnimation();
   const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+// Trigger animations every time the section comes into view
+const isInView = useInView(sectionRef, { once: false, margin: "-100px" });
 
-  // Trigger animations when section is in view
-  useEffect(() => {
-    if (isInView) controls.start("visible");
-  }, [isInView, controls]);
+useEffect(() => {
+  if (isInView) controls.start("visible");
+  else controls.start("hidden"); // reset when leaving viewport
+}, [isInView, controls]);
 
   return (
     <div ref={sectionRef} className="relative max-w-6xl mx-auto px-5 py-2">
