@@ -91,8 +91,7 @@ export default function TestimonialPopup() {
     switch (position) {
       case "bottom-left":
         return "bottom-10 left-8";
-      case "bottom-center":
-        return "bottom-8 left-1/2 -translate-x-1/2";
+      
       case "bottom-right":
         return "bottom-10 right-8";
       default:

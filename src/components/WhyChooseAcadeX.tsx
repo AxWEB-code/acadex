@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useAnimation } from "framer-motion";
-import { useEffect } from "react";
+import { motion, useAnimation, useInView } from "framer-motion";
+import { useEffect, useRef } from "react";
 import {
   GraduationCap,
   WifiOff,
@@ -52,14 +52,16 @@ const fadeLift = {
 
 export default function WhyChooseAcadeX() {
   const controls = useAnimation();
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  // 🟢 Instantly trigger animation (no scroll delay)
+  // Trigger animations when section is in view
   useEffect(() => {
-    controls.start("visible");
-  }, [controls]);
+    if (isInView) controls.start("visible");
+  }, [isInView, controls]);
 
   return (
-    <div className="relative max-w-6xl mx-auto px-5 py-2">
+    <div ref={sectionRef} className="relative max-w-6xl mx-auto px-5 py-2">
       {/* ✨ Subtle Animated Background Glow */}
       <motion.div
         className="absolute inset-0 -z-10 blur-3xl opacity-30"
@@ -75,18 +77,18 @@ export default function WhyChooseAcadeX() {
 
       {/* ✳️ Elegant Heading */}
       <motion.h2
-  id="wca-heading"
-  initial={{ opacity: 0, y: 40 }}
-  animate={controls}
-  variants={{
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
-  }}
-  className="text-4xl md:text-5xl font-bold mb-2 text-center text-white relative"
->
-  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-300 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-    Why Choose AcadeX
-  </span>
+        id="wca-heading"
+        initial={{ opacity: 0, y: 40 }}
+        animate={controls}
+        variants={{
+          hidden: { opacity: 0, y: 40 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+        }}
+        className="text-4xl md:text-5xl font-bold mb-2 text-center text-white relative"
+      >
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-300 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+          Why Choose AcadeX
+        </span>
         <motion.div
           className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-24 h-[3px] bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
           initial={{ scaleX: 0 }}
