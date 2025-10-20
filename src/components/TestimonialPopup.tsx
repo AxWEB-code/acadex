@@ -111,15 +111,19 @@ export default function TestimonialPopup() {
           transition={{ duration: 0.7 }}
           className={`fixed ${getPositionClasses()} z-50`}
         >
-          <div className="relative backdrop-blur-md bg-gray-900/70 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)] rounded-2xl px-3 py-2 sm:px-5 sm:py-3 max-w-[90vw] sm:max-w-sm text-center text-gray-200 text-xs sm:text-[0.9rem] leading-relaxed">
-            <button
-              onClick={() => setVisible(false)}
-              className="absolute top-1.5 right-2 text-gray-400 hover:text-gray-200 text-xs"
-            >
-              ✕
-            </button>
-            <p ref={typedRef} className="font-medium px-1 sm:px-2"></p>
-          </div>
+          <div
+  className={`relative backdrop-blur-md bg-gray-900/70 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]
+  rounded-2xl w-48 h-30 sm:max-w-sm sm:h-auto px-3 py-3 flex items-center justify-center text-center text-gray-200 text-xs sm:text-[0.9rem] leading-relaxed`}
+>
+  <button
+    onClick={() => setVisible(false)}
+    className="absolute top-1.5 right-2 text-gray-400 hover:text-gray-200 text-xs"
+  >
+    ✕
+  </button>
+  <p ref={typedRef} className="font-medium px-1 sm:px-2"></p>
+</div>
+
         </motion.div>
       )}
     </AnimatePresence>
