@@ -46,7 +46,7 @@ const fadeLift = {
     transition: {
       delay: custom * 0.2,
       duration: 0.6,
-      ease: "easeOut" as const, 
+      ease: "easeOut" as const,
     },
   }),
 };
@@ -61,7 +61,7 @@ export default function WhyChooseAcadeX() {
   }, [inView, controls]);
 
   return (
-    <div ref={ref} className="relative max-w-6xl mx-auto px-6 py-20">
+    <div ref={ref} className="relative max-w-6xl mx-auto px-6 py-16"> {/* reduced from py-20 to py-16 */}
       {/* ✨ Subtle Animated Background Glow */}
       <motion.div
         className="absolute inset-0 -z-10 blur-3xl opacity-30"
@@ -122,7 +122,7 @@ export default function WhyChooseAcadeX() {
             initial="hidden"
             animate={controls}
             variants={fadeLift}
-            className="relative bg-gray-800/60 p-6 rounded-2xl shadow-lg border border-gray-700 hover:bg-gray-800/80 transition-all hover:shadow-[0_0_15px_rgba(59,130,246,0.35)]"
+            className="relative bg-gray-800/60 p-6 rounded-2xl shadow-lg border border-gray-700"
           >
             <div className="flex flex-col items-center text-center space-y-3 relative z-10">
               <div className="relative">{f.icon}</div>
@@ -171,7 +171,7 @@ export default function WhyChooseAcadeX() {
             transition: { delay: 0.5, duration: 0.9, ease: "easeOut" },
           },
         }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 text-gray-300 text-center"
+        className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-14 text-gray-300 text-center"
       >
         <div>
           <ShieldCheck size={36} className="mx-auto mb-2 text-blue-400" />
@@ -195,17 +195,14 @@ export default function WhyChooseAcadeX() {
         </div>
       </motion.div>
 
-      {/* 🚀 CTA */}
+      {/* 🩵 END INDICATOR — Smooth divider */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={controls}
-        variants={{
-          hidden: { opacity: 0, y: 20 },
-          visible: { opacity: 1, y: 0, transition: { delay: 1, duration: 0.6 } },
-        }}
-        className="text-center mt-14"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="mt-16 mb-4 flex justify-center"
       >
-      
+        <div className="h-[2px] w-2/3 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent rounded-full"></div>
       </motion.div>
     </div>
   );

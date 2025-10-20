@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import FloatingIcons from "@/components/FloatingIcons";
 import WhyChooseAcadeX from "@/components/WhyChooseAcadeX"; 
 import TestimonialPopup from "@/components/TestimonialPopup";
+import FeaturesSection from "@/components/FeaturesSection";
 
 export default function Home() {
   return (
@@ -94,6 +95,7 @@ export default function Home() {
       >
         <WhyChooseAcadeX />
         <TestimonialPopup />
+        <FeaturesSection />
       </section>
 
       
