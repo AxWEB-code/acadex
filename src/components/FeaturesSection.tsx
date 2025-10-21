@@ -56,31 +56,35 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="relative py-15 text-gray-100 overflow-hidden">
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
+    <section className="relative py-20 text-gray-100 overflow-hidden bg-gray-900/40 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Header */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-3xl md:text-4xl font-bold text-white mb-14"
+          viewport={{ once: true }}
+          className="text-3xl md:text-4xl font-bold text-center mb-16"
         >
           Explore <span className="text-blue-500">AcadeX Features</span>
         </motion.h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+        {/* Feature Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
           {features.map((f, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="border border-gray-700/60 rounded-2xl p-6 backdrop-blur-sm bg-gray-800/30 text-center shadow-[0_0_10px_rgba(59,130,246,0.08)]"
+              viewport={{ once: true }}
+              className="flex items-start space-x-5"
             >
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-3 bg-gray-900/70 rounded-full border border-gray-700/50 shadow-inner">
-                  {f.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-white">
+              <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400 flex-shrink-0">
+                {f.icon}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-1 text-white">
                   {f.title}
                 </h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
