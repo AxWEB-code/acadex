@@ -60,14 +60,27 @@ export default function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-center mb-16"
-        >
-          Explore <span className="text-blue-500">AcadeX Features</span>
-        </motion.h2>
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+  viewport={{ once: true }}
+  className="text-3xl md:text-4xl font-bold text-center mb-16"
+>
+  <motion.span
+    animate={{
+      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+    }}
+    transition={{
+      duration: 5,
+      repeat: Infinity,
+      ease: "linear",
+    }}
+    className="bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500 bg-[length:200%_200%] text-transparent bg-clip-text drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+  >
+    Explore AcadeX Features
+  </motion.span>
+</motion.h2>
+
 
         {/* Feature Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
