@@ -47,7 +47,7 @@ export default function FloatingIcons() {
           key={i}
           initial={{ opacity: 0, y: 0 }}
           animate={{
-            opacity: [0.15, 0.6, 0.15],
+            opacity: [0.30, 0.6, 0.30],
             y: [0, -25, 0],
           }}
           transition={{
