@@ -105,7 +105,10 @@ export default function Home() {
 </section>
 
     <FAQSection />
-    <ContactSection />
+    <section id="contact">
+  <ContactSection />
+</section>
+
   </div>
 </section>
 

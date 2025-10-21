@@ -40,8 +40,9 @@ export default function ContactSection() {
                 <Phone className="text-blue-400 w-6 h-6" />
               </div>
               <span className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                +1 (800) 555-ACDX
-              </span>
+  +234 806 122 8340
+</span>
+
             </div>
 
             <div className="flex items-start sm:items-center gap-4">

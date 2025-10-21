@@ -11,11 +11,11 @@ export default function Navbar() {
 
   const navLinks = [
   { name: "Home", href: "#home" },
-  { name: "Features", href: "<featuresSection" },
+  { name: "Features", href: "#features" },
   { name: "Contact", href: "#contact" },
   { name: "Portal", href: "#portal" }, 
-  
 ];
+
 
   useEffect(() => {
     const onScroll = () => {
