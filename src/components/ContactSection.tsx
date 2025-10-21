@@ -1,35 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 
 export default function ContactSection() {
-  const [hydrated, setHydrated] = useState(false);
-
-  // ✅ Wait until component is hydrated before running animations
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
-  if (!hydrated) {
-    // Render static fallback (no animation yet)
-    return (
-      <section className="relative py-28 text-gray-100 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050B1E] via-[#0A122E] to-[#0F1738]" />
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-14 relative z-10">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-              Contact <span className="text-blue-500">AcadeX</span>
-            </h2>
-            <p className="text-gray-400 mt-4">
-              Loading contact form...
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="relative py-28 text-gray-100 overflow-hidden">
       {/* 🌌 Background */}
@@ -53,25 +26,29 @@ export default function ContactSection() {
           </p>
 
           <div className="space-y-5 pt-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-blue-500/10">
+            <div className="flex items-start sm:items-center gap-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10 flex-shrink-0">
                 <Mail className="text-blue-400 w-6 h-6" />
               </div>
-              <span className="text-gray-300">support@acadex.com</span>
+              <span className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                support@acadex.com
+              </span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-blue-500/10">
+            <div className="flex items-start sm:items-center gap-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10 flex-shrink-0">
                 <Phone className="text-blue-400 w-6 h-6" />
               </div>
-              <span className="text-gray-300">+234 806 122 8340</span>
+              <span className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                +1 (800) 555-ACDX
+              </span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-blue-500/10">
+            <div className="flex items-start sm:items-center gap-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10 flex-shrink-0">
                 <MapPin className="text-blue-400 w-6 h-6" />
               </div>
-              <span className="text-gray-300">
+              <span className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 Global — Empowering Schools Everywhere
               </span>
             </div>
@@ -96,7 +73,10 @@ export default function ContactSection() {
               />
               <label
                 htmlFor="name"
-                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 peer-focus:text-sm"
+                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all 
+                peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 
+                peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 
+                peer-focus:text-sm"
               >
                 Your Name
               </label>
@@ -112,7 +92,10 @@ export default function ContactSection() {
               />
               <label
                 htmlFor="email"
-                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 peer-focus:text-sm"
+                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all 
+                peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 
+                peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 
+                peer-focus:text-sm"
               >
                 Your Email
               </label>
@@ -128,7 +111,10 @@ export default function ContactSection() {
               />
               <label
                 htmlFor="message"
-                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 peer-focus:text-sm"
+                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all 
+                peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 
+                peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 
+                peer-focus:text-sm"
               >
                 Your Message
               </label>
@@ -139,7 +125,10 @@ export default function ContactSection() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               type="submit"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 font-semibold text-white shadow-lg transition-all duration-300"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl 
+              bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 
+              hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 
+              font-semibold text-white shadow-lg transition-all duration-300"
             >
               <Send className="w-5 h-5" />
               Send Message
