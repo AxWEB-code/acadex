@@ -100,7 +100,10 @@ export default function Home() {
   <div className="pt-20 md:pt-32">
     <WhyChooseAcadeX />
     <TestimonialPopup />
-    <FeaturesSection />
+    <section id="features">
+  <FeaturesSection />
+</section>
+
     <FAQSection />
     <ContactSection />
   </div>

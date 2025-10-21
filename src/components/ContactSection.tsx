@@ -1,73 +1,149 @@
 "use client";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Mail, Phone, MapPin, Send } from "lucide-react";
 
 export default function ContactSection() {
-  return (
-    <section className="relative py-24 text-gray-100 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-purple-800/10 to-transparent pointer-events-none"></div>
+  const [hydrated, setHydrated] = useState(false);
 
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 relative z-10">
-        {/* Left - Info */}
+  // ✅ Wait until component is hydrated before running animations
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) {
+    // Render static fallback (no animation yet)
+    return (
+      <section className="relative py-28 text-gray-100 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050B1E] via-[#0A122E] to-[#0F1738]" />
+        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-14 relative z-10">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+              Contact <span className="text-blue-500">AcadeX</span>
+            </h2>
+            <p className="text-gray-400 mt-4">
+              Loading contact form...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="relative py-28 text-gray-100 overflow-hidden">
+      {/* 🌌 Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050B1E] via-[#0A122E] to-[#0F1738]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.15),transparent_60%)] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-14 relative z-10">
+        {/* 💫 Left Info Section */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="space-y-6"
+          transition={{ duration: 0.7 }}
+          className="space-y-8"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Get in <span className="text-blue-500">Touch</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+            Contact <span className="text-blue-500">AcadeX</span>
           </h2>
-          <p className="text-gray-400 mb-8">
-            Have a question or want to learn more about AcadeX? We’d love to hear from you.  
-            Fill out the form or reach us directly through any of the contacts below.
+          <p className="text-gray-400 leading-relaxed max-w-md">
+            We’re always excited to hear from you — whether it’s support, partnership, or product
+            inquiry. Send us a message and we’ll get back to you shortly.
           </p>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Mail className="text-blue-400 w-6 h-6" />
-              <span>support@acadex.com</span>
+          <div className="space-y-5 pt-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10">
+                <Mail className="text-blue-400 w-6 h-6" />
+              </div>
+              <span className="text-gray-300">support@acadex.com</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Phone className="text-blue-400 w-6 h-6" />
-              <span>+1 (800) 555-ACDX</span>
+
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10">
+                <Phone className="text-blue-400 w-6 h-6" />
+              </div>
+              <span className="text-gray-300">+234 806 122 8340</span>
             </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="text-blue-400 w-6 h-6" />
-              <span>Worldwide – Online Education Platform</span>
+
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10">
+                <MapPin className="text-blue-400 w-6 h-6" />
+              </div>
+              <span className="text-gray-300">
+                Global — Empowering Schools Everywhere
+              </span>
             </div>
           </div>
         </motion.div>
 
-        {/* Right - Form */}
+        {/* ✨ Modern Form */}
         <motion.form
-          initial={{ opacity: 0, x: 20 }}
+          initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-gray-800/40 backdrop-blur-sm p-8 rounded-2xl border border-gray-700/60 shadow-[0_0_20px_rgba(59,130,246,0.05)]"
+          transition={{ duration: 0.7 }}
+          className="relative bg-[#0D132B]/60 backdrop-blur-xl p-8 rounded-3xl border border-blue-500/10 shadow-[0_0_40px_rgba(59,130,246,0.07)]"
         >
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Your Name"
-              className="w-full px-4 py-3 bg-gray-900/70 rounded-xl border border-gray-700 text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none"
-            />
-            <input
-              type="email"
-              placeholder="Your Email"
-              className="w-full px-4 py-3 bg-gray-900/70 rounded-xl border border-gray-700 text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none"
-            />
-            <textarea
-              placeholder="Your Message"
-              rows={4}
-              className="w-full px-4 py-3 bg-gray-900/70 rounded-xl border border-gray-700 text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none resize-none"
-            />
-            <button
+          <div className="space-y-6">
+            {/* Name Field */}
+            <div className="relative">
+              <input
+                type="text"
+                id="name"
+                className="peer w-full rounded-2xl bg-[#111936]/70 border border-gray-700 text-gray-100 px-4 pt-5 pb-2 focus:border-blue-500 outline-none transition-all duration-300 placeholder-transparent"
+                placeholder="Your Name"
+              />
+              <label
+                htmlFor="name"
+                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 peer-focus:text-sm"
+              >
+                Your Name
+              </label>
+            </div>
+
+            {/* Email Field */}
+            <div className="relative">
+              <input
+                type="email"
+                id="email"
+                className="peer w-full rounded-2xl bg-[#111936]/70 border border-gray-700 text-gray-100 px-4 pt-5 pb-2 focus:border-blue-500 outline-none transition-all duration-300 placeholder-transparent"
+                placeholder="Your Email"
+              />
+              <label
+                htmlFor="email"
+                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 peer-focus:text-sm"
+              >
+                Your Email
+              </label>
+            </div>
+
+            {/* Message Field */}
+            <div className="relative">
+              <textarea
+                id="message"
+                rows={5}
+                className="peer w-full rounded-2xl bg-[#111936]/70 border border-gray-700 text-gray-100 px-4 pt-5 pb-2 focus:border-blue-500 outline-none transition-all duration-300 placeholder-transparent resize-none"
+                placeholder="Your Message"
+              />
+              <label
+                htmlFor="message"
+                className="absolute left-4 top-3.5 text-gray-400 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-blue-400 peer-focus:text-sm"
+              >
+                Your Message
+              </label>
+            </div>
+
+            {/* Button */}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium text-white transition-all duration-300"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 font-semibold text-white shadow-lg transition-all duration-300"
             >
+              <Send className="w-5 h-5" />
               Send Message
-            </button>
+            </motion.button>
           </div>
         </motion.form>
       </div>
