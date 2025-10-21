@@ -200,7 +200,7 @@ useEffect(() => {
      <motion.div
   initial={{ opacity: 0 }}
   animate={{ opacity: 1, transition: { duration: 1 } }}
-  className="mt-14 mb-20 flex justify-center"
+  className="mt-9 mb-13 flex justify-center"
 >
   
 </motion.div>

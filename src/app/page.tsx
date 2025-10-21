@@ -7,6 +7,10 @@ import FloatingIcons from "@/components/FloatingIcons";
 import WhyChooseAcadeX from "@/components/WhyChooseAcadeX"; 
 import TestimonialPopup from "@/components/TestimonialPopup";
 import FeaturesSection from "@/components/FeaturesSection";
+import dynamic from "next/dynamic";
+const FAQSection = dynamic(() => import("@/components/FAQSection"), { ssr: false });
+
+import ContactSection from "@/components/ContactSection";
 
 export default function Home() {
   return (
@@ -97,6 +101,8 @@ export default function Home() {
     <WhyChooseAcadeX />
     <TestimonialPopup />
     <FeaturesSection />
+    <FAQSection />
+    <ContactSection />
   </div>
 </section>
 
