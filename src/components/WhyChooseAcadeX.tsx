@@ -197,14 +197,14 @@ useEffect(() => {
         </div>
       </motion.div>
 
-      {/* 🩵 END INDICATOR — Smooth divider */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { duration: 1 } }}
-        className="mt-16 mb-4 flex justify-center"
-      >
-        <div className="h-[2px] w-2/3 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent rounded-full"></div>
-      </motion.div>
+     <motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1, transition: { duration: 1 } }}
+  className="mt-14 mb-20 flex justify-center"
+>
+  
+</motion.div>
+
     </div>
   );
 }
