@@ -71,10 +71,11 @@ export default function Home() {
 
     <button
   onClick={() => {
-    const wcaHeading = document.getElementById("wca-heading");
-    if (wcaHeading) {
-      const navbarHeight = window.innerWidth >= 768 ? 100 : 70; // adjust for fixed navbar
-      const top = wcaHeading.getBoundingClientRect().top + window.scrollY - navbarHeight;
+    const aboutSection = document.getElementById("about");
+    if (aboutSection) {
+      const navbarHeight = window.innerWidth >= 500 ? 70 : 35; // 🔹 reduced offset for tighter spacing
+      const top =
+        aboutSection.getBoundingClientRect().top + window.scrollY - navbarHeight;
       window.scrollTo({ top, behavior: "smooth" });
     }
   }}
@@ -82,6 +83,8 @@ export default function Home() {
 >
   Learn More
 </button>
+
+
 
   </motion.div>
 </section>
