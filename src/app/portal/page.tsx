@@ -26,17 +26,24 @@ import {
 export default function PortalPage() {
   const [role, setRole] = useState<"admin" | "student" | null>(null);
 
+  // 🧩 Disable scrolling when component mounts
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto"; // restore if you leave the page
+    };
+  }, []);
+
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden">
+    <div className="relative h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden">
       {/* ✨ Background Layers */}
       <GradientGlow />
       <ParticlesLayer />
       <FloatingIcons />
 
-      {/* 🪶 Static Logo Outside the Card */}
-      <div className="flex flex-col items-center mb-6 z-10">
+      {/* 🪶 Static Logo Above Card */}
+      <div className="flex flex-col items-center mb-6 z-10 select-none">
         <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-2">
-          {/* Glow behind logo */}
           <motion.div
             className="absolute inset-0 bg-blue-500/25 blur-2xl rounded-full"
             animate={{ opacity: [0.4, 0.6, 0.4], scale: [1, 1.1, 1] }}
@@ -44,13 +51,12 @@ export default function PortalPage() {
           />
           <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-blue-500 shadow-lg shadow-blue-500/30">
             <img
-              src="/logo.png" // ✅ ensure /public/logo.png exists
+              src="/logo.png"
               alt="AcadeX Logo"
               className="w-full h-full object-cover"
             />
           </div>
         </div>
-       
       </div>
 
       {/* 🧭 Login Card */}
