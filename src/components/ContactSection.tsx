@@ -66,7 +66,7 @@ export default function ContactSection() {
                 <Mail className="text-blue-400 w-6 h-6" />
               </div>
               <span className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                support@acadex.com
+                Hello.acadex@gmail.com
               </span>
             </div>
 
