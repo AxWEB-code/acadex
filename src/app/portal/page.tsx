@@ -115,14 +115,21 @@ function LoginForm({ role, goBack }: { role: "admin" | "student"; goBack: () => 
 function FloatingIcons() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false); // ✅ prevent SSR window usage
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 640); // Detect mobile screen
+    setMounted(true); // runs only in browser
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 640);
+    }
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isMobile) setMouse({ x: e.clientX, y: e.clientY });
   };
+
+  // ✅ Don’t render icons on the server
+  if (!mounted) return null;
 
   const icons = [
     { Icon: Book, size: 36, top: "10%", left: "12%", delay: 0 },
@@ -147,8 +154,11 @@ function FloatingIcons() {
   return (
     <div className="absolute inset-0 overflow-hidden" onMouseMove={handleMouseMove}>
       {icons.map(({ Icon, size, top, left, delay }, i) => {
-        const dx = mouse.x - window.innerWidth * (parseFloat(left) / 100);
-        const dy = mouse.y - window.innerHeight * (parseFloat(top) / 100);
+        // ✅ only execute window-dependent code after mount
+        const w = typeof window !== "undefined" ? window.innerWidth : 0;
+        const h = typeof window !== "undefined" ? window.innerHeight : 0;
+        const dx = mouse.x - w * (parseFloat(left) / 100);
+        const dy = mouse.y - h * (parseFloat(top) / 100);
         const distance = Math.sqrt(dx * dx + dy * dy);
         const intensity = Math.max(0, 1 - distance / 400);
 
@@ -166,7 +176,7 @@ function FloatingIcons() {
             animate={{
               opacity: 0.1 + intensity * 0.4,
               scale: 1,
-              y: [0, isMobile ? -4 : -8, 0], // gentler bounce on mobile
+              y: [0, isMobile ? -4 : -8, 0],
               rotate: [0, isMobile ? 6 : 10, 0],
             }}
             transition={{
@@ -183,6 +193,7 @@ function FloatingIcons() {
     </div>
   );
 }
+
 
 /* ------------------ PARTICLES LAYER ------------------ */
 function ParticlesLayer() {
