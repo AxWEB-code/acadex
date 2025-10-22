@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 import {
   Shield,
   GraduationCap,
@@ -28,14 +28,12 @@ export default function PortalPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden">
-      {/* 🌈 Gradient Glow */}
+      {/* ✨ Background Layers */}
       <GradientGlow />
-
-      {/* 🪶 Floating Icons */}
+      <ParticlesLayer />
       <FloatingIcons />
 
-
-      {/* Login Card */}
+      {/* 🧭 Login Card */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -113,12 +111,17 @@ function LoginForm({ role, goBack }: { role: "admin" | "student"; goBack: () => 
   );
 }
 
-/* ------------------ FLOATING ICONS (with entrance fade) ------------------ */
+/* ------------------ FLOATING ICONS ------------------ */
 function FloatingIcons() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 640); // Detect mobile screen
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    setMouse({ x: e.clientX, y: e.clientY });
+    if (!isMobile) setMouse({ x: e.clientX, y: e.clientY });
   };
 
   const icons = [
@@ -157,21 +160,58 @@ function FloatingIcons() {
               top,
               left,
               opacity: 0.07 + intensity * 0.4,
-              filter: `drop-shadow(0 0 ${10 + intensity * 25}px rgba(59,130,246,0.6))`,
+              filter: `drop-shadow(0 0 ${10 + intensity * 20}px rgba(59,130,246,0.6))`,
             }}
             initial={{ opacity: 0, scale: 0.8, y: 10 }}
-            animate={{ opacity: 0.1 + intensity * 0.4, scale: 1, y: [0, -8, 0] }}
+            animate={{
+              opacity: 0.1 + intensity * 0.4,
+              scale: 1,
+              y: [0, isMobile ? -4 : -8, 0], // gentler bounce on mobile
+              rotate: [0, isMobile ? 6 : 10, 0],
+            }}
             transition={{
-              duration: 1.2,
-              delay: delay * 0.5, // staggered fade-in
-              ease: "easeOut",
-              repeatDelay: 0,
+              duration: 6,
               repeat: Infinity,
-              repeatType: "reverse",
+              ease: "easeInOut",
+              delay,
             }}
           >
             <Icon size={size} />
           </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------ PARTICLES LAYER ------------------ */
+function ParticlesLayer() {
+  const particles = Array.from({ length: 25 });
+
+  return (
+    <div className="absolute inset-0 -z-20 overflow-hidden">
+      {particles.map((_, i) => {
+        const size = Math.random() * 3 + 1;
+        const left = `${Math.random() * 100}%`;
+        const top = `${Math.random() * 100}%`;
+        const duration = Math.random() * 8 + 6;
+
+        return (
+          <motion.div
+            key={i}
+            className="absolute bg-blue-400/40 rounded-full blur-[2px]"
+            style={{ width: size, height: size, left, top }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.2, 0.6, 0.2],
+            }}
+            transition={{
+              duration,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: Math.random() * 5,
+            }}
+          />
         );
       })}
     </div>
@@ -195,4 +235,3 @@ function GradientGlow() {
     </div>
   );
 }
-
