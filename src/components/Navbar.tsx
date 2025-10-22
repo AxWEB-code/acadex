@@ -10,13 +10,12 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   const navLinks = [
-  { name: "Home", href: "#home" },
-  { name: "Features", href: "#features" },
-  { name: "Faq", href: "#faq" },
-  { name: "Contact", href: "#contact" },
-  { name: "Portal", href: "#portal" }, 
-];
-
+    { name: "Home", href: "#home" },
+    { name: "Features", href: "#features" },
+    { name: "Faq", href: "#faq" },
+    { name: "Contact", href: "#contact" },
+    { name: "Portal", href: "/portal" },
+  ];
 
   useEffect(() => {
     const onScroll = () => {
@@ -33,9 +32,6 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 w-full z-50 px-6 md:px-16 py-4 text-white flex items-center justify-between transition-all`}
-      style={{
-        // keep layout stable while allowing visual changes via classes below
-      }}
     >
       {/* Dimmed glass when scrolled */}
       <div
@@ -57,6 +53,7 @@ export default function Navbar() {
           <div key={link.name} className="relative group">
             <Link
               href={link.href}
+              prefetch={false} // 🔹 Added here
               className="hover:text-blue-300 transition-colors duration-200"
             >
               {link.name}
@@ -91,6 +88,7 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
+                  prefetch={false} // 🔹 Added here too
                   className="text-white text-lg hover:text-blue-300 transition font-medium"
                   onClick={() => setIsOpen(false)}
                 >
