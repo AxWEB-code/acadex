@@ -1,267 +1,608 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Shield,
+  LogIn,
+  UserPlus,
   GraduationCap,
-  Book,
-  Wifi,
-  BarChart3,
-  Layers,
-  Rocket,
-  Cloud,
-  Users,
-  Lock,
-  Globe,
-  Cpu,
-  Database,
-  Key,
-  Laptop,
-  ClipboardCheck,
-  FileText,
-  Server,
+  ShieldCheck,
+  ArrowLeft,
+  Mail,
+  KeyRound,
 } from "lucide-react";
+import Link from "next/link";
+import { fetchJSON } from "@/lib/api";
 
-export default function PortalPage() {
-  const [role, setRole] = useState<"admin" | "student" | null>(null);
+export default function PortalLoginPage() {
+  const [school, setSchool] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [step, setStep] = useState(1); // form tab
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // 🧩 Disable scrolling when component mounts
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "",
+    password: "",
+    dob: "",
+    admissionNo: "",
+    department: "",
+    level: "",
+    class: "",
+    semester: "",
+    term: "",
+    academicYear: "",
+    contactNumber: "",
+  });
+
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "auto"; // restore if you leave the page
-    };
+    const stored = localStorage.getItem("selectedSchool");
+    if (stored) {
+      const s = JSON.parse(stored);
+      setSchool(s);
+      loadDepartments(s.id);
+    } else window.location.href = "/schools";
   }, []);
 
-  return (
-    <div className="relative h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden">
-      {/* ✨ Background Layers */}
-      <GradientGlow />
-      <ParticlesLayer />
-      <FloatingIcons />
-
-      {/* 🪶 Static Logo Above Card */}
-      <div className="flex flex-col items-center mb-6 z-10 select-none">
-        <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-2">
-          <motion.div
-            className="absolute inset-0 bg-blue-500/25 blur-2xl rounded-full"
-            animate={{ opacity: [0.4, 0.6, 0.4], scale: [1, 1.1, 1] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-blue-500 shadow-lg shadow-blue-500/30">
-            <img
-              src="/logo.png"
-              alt="AcadeX Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 🧭 Login Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative w-[90%] sm:w-[420px] p-6 sm:p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl z-10"
-      >
-        {!role ? (
-          <div className="flex flex-col gap-4">
-            <button
-              onClick={() => setRole("admin")}
-              className="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-blue-600/30"
-            >
-              <Shield size={20} /> Admin Login
-            </button>
-            <button
-              onClick={() => setRole("student")}
-              className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-all shadow-md hover:shadow-green-600/30"
-            >
-              <GraduationCap size={20} /> Student Login
-            </button>
-          </div>
-        ) : (
-          <LoginForm role={role} goBack={() => setRole(null)} />
-        )}
-      </motion.div>
-    </div>
-  );
-}
-
-/* ------------------ LOGIN FORM ------------------ */
-function LoginForm({ role, goBack }: { role: "admin" | "student"; goBack: () => void }) {
-  return (
-    <div>
-      <h3 className="text-2xl font-semibold mb-6 text-center text-blue-400">
-        {role === "admin" ? "Admin Login" : "Student Login"}
-      </h3>
-
-      <form
-        className="flex flex-col gap-5"
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
-        <input
-          type="text"
-          placeholder={role === "admin" ? "Email or Username" : "Matric Number"}
-          className="bg-[#1c1f2b] border border-blue-900/40 p-3 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="bg-[#1c1f2b] border border-blue-900/40 p-3 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-all font-medium shadow-md hover:shadow-blue-600/30"
-        >
-          Login
-        </button>
-      </form>
-
-      <button
-        onClick={goBack}
-        className="text-sm text-gray-400 mt-6 hover:text-blue-300 transition"
-      >
-        ← Back
-      </button>
-    </div>
-  );
-}
-
-/* ------------------ FLOATING ICONS ------------------ */
-function FloatingIcons() {
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined") {
-      setIsMobile(window.innerWidth < 640);
+  const loadDepartments = async (id: number) => {
+    try {
+      const res = await fetchJSON(`/api/departments?schoolId=${id}`);
+      setDepartments(res || []);
+    } catch {
+      setDepartments([]);
     }
-  }, []);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isMobile) setMouse({ x: e.clientX, y: e.clientY });
   };
 
-  if (!mounted) return null;
+  const handleChange = (e: any) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const icons = [
-    { Icon: Book, size: 36, top: "10%", left: "12%", delay: 0 },
-    { Icon: Wifi, size: 40, top: "25%", left: "75%", delay: 0.4 },
-    { Icon: BarChart3, size: 44, top: "70%", left: "20%", delay: 0.8 },
-    { Icon: Shield, size: 42, top: "85%", left: "70%", delay: 1.2 },
-    { Icon: Layers, size: 38, top: "55%", left: "88%", delay: 1.0 },
-    { Icon: Rocket, size: 42, top: "60%", left: "5%", delay: 0.6 },
-    { Icon: Cloud, size: 38, top: "15%", left: "60%", delay: 0.7 },
-    { Icon: Users, size: 38, top: "78%", left: "45%", delay: 0.3 },
-    { Icon: Lock, size: 35, top: "35%", left: "40%", delay: 0.5 },
-    { Icon: Globe, size: 36, top: "50%", left: "10%", delay: 0.9 },
-    { Icon: Cpu, size: 36, top: "18%", left: "30%", delay: 0.4 },
-    { Icon: Database, size: 38, top: "65%", left: "82%", delay: 1.1 },
-    { Icon: Key, size: 34, top: "82%", left: "30%", delay: 0.3 },
-    { Icon: Laptop, size: 36, top: "40%", left: "65%", delay: 0.5 },
-    { Icon: ClipboardCheck, size: 36, top: "58%", left: "50%", delay: 0.8 },
-    { Icon: FileText, size: 38, top: "32%", left: "20%", delay: 0.6 },
-    { Icon: Server, size: 40, top: "73%", left: "60%", delay: 1.0 },
-  ];
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    if (!form.email || !form.password)
+      return setMessage("Please fill in all fields.");
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const endpoint = isAdmin
+        ? "/api/auth/admin/login"
+        : "/api/auth/student/login";
+
+      const res = await fetchJSON(endpoint, {
+        method: "POST",
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          schoolSubdomain: school.subdomain,
+        }),
+      });
+
+      if (res.token) {
+        localStorage.setItem("acadexUser", JSON.stringify(res));
+        window.location.href = isAdmin
+          ? "/portal/admin/dashboard"
+          : "/portal/student/dashboard";
+      } else {
+        setMessage(res.error || "Invalid credentials.");
+      }
+    } catch {
+      setMessage("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgot = async (e: any) => {
+    e.preventDefault();
+    if (!form.email) return setMessage("Enter your email to reset password.");
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      await fetchJSON("/api/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({
+          email: form.email,
+          schoolSubdomain: school.subdomain,
+        }),
+      });
+      setMessage("📧 Password reset instructions sent to your email.");
+    } catch {
+      setMessage("Failed to send reset link.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetchJSON("/api/students/register", {
+        method: "POST",
+        body: JSON.stringify({
+          ...form,
+          schoolSubdomain: school.subdomain,
+        }),
+      });
+
+      if (res.student) {
+        setMessage("✅ Registration successful! You can now log in.");
+        setIsRegister(false);
+        setStep(1);
+      } else {
+        setMessage(res.error || "Registration failed.");
+      }
+    } catch {
+      setMessage("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!school) return null;
+
+  // 🎨 use original blue/purple glow theme for both; admin slightly darker
+  const bgColors = isAdmin
+    ? "from-[#0a0a0f] via-[#0c0c14] to-[#0f1620]"
+    : "from-[#0a0a0f] via-[#0c0c15] to-[#111827]";
+  const accentColor = "text-blue-400";
+  const btnColor = "bg-blue-500 hover:bg-blue-600";
 
   return (
-    <div className="absolute inset-0 overflow-hidden" onMouseMove={handleMouseMove}>
-      {icons.map(({ Icon, size, top, left, delay }, i) => {
-        const w = typeof window !== "undefined" ? window.innerWidth : 0;
-        const h = typeof window !== "undefined" ? window.innerHeight : 0;
-        const dx = mouse.x - w * (parseFloat(left) / 100);
-        const dy = mouse.y - h * (parseFloat(top) / 100);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const intensity = Math.max(0, 1 - distance / 400);
+    <div
+      className={`min-h-screen flex flex-col items-center justify-center bg-gradient-to-b ${bgColors} text-white px-6 py-10 overflow-hidden relative`}
+    >
+      {/* 🌫 Floating breadcrumb */}
+      <div className="fixed top-5 left-5 z-50">
+        <Link
+          href="/schools"
+          className="flex items-center gap-2 bg-white/10 backdrop-blur-lg border border-white/10 px-3 py-2 rounded-full text-gray-300 hover:text-blue-400 text-sm shadow-md transition"
+        >
+          <ArrowLeft size={16} /> Back to Schools
+        </Link>
+      </div>
 
-        return (
-          <motion.div
-            key={i}
-            className="absolute text-blue-400"
-            style={{
-              top,
-              left,
-              opacity: 0.07 + intensity * 0.4,
-              filter: `drop-shadow(0 0 ${10 + intensity * 20}px rgba(59,130,246,0.6))`,
-            }}
-            animate={{
-              opacity: 0.1 + intensity * 0.4,
-              y: [0, isMobile ? -4 : -8, 0],
-            }}
-            transition={{
-              duration: 5.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay,
-            }}
-          >
-            <Icon size={size} />
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ------------------ PARTICLES LAYER ------------------ */
-function ParticlesLayer() {
-  const [particles, setParticles] = useState<
-    { size: number; left: string; top: string; duration: number; delay: number }[]
-  >([]);
-
-  useEffect(() => {
-    const newParticles = Array.from({ length: 25 }).map(() => ({
-      size: Math.random() * 3 + 1,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      duration: Math.random() * 8 + 6,
-      delay: Math.random() * 5,
-    }));
-    setParticles(newParticles);
-  }, []);
-
-  if (particles.length === 0) return null;
-
-  return (
-    <div className="absolute inset-0 -z-20 overflow-hidden">
-      {particles.map((p, i) => (
+      {/* animated glow background */}
+      <motion.div
+        className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10"
+        animate={{ opacity: [0.9, 1, 0.9] }}
+        transition={{ duration: 10, repeat: Infinity }}
+      >
         <motion.div
-          key={i}
-          className="absolute bg-blue-400/40 rounded-full blur-[2px]"
-          style={{ width: p.size, height: p.size, left: p.left, top: p.top }}
-          animate={{ y: [0, -20, 0], opacity: [0.2, 0.6, 0.2] }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: p.delay,
-          }}
+          className="absolute top-[15%] left-[10%] w-[300px] h-[300px] bg-blue-700/25 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.15, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
-      ))}
-    </div>
-  );
-}
+        <motion.div
+          className="absolute bottom-[10%] right-[10%] w-[350px] h-[350px] bg-purple-700/25 rounded-full blur-3xl"
+          animate={{ scale: [1.05, 1.25, 1.05] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
 
-/* ------------------ SOFT GRADIENT GLOW ------------------ */
-function GradientGlow() {
-  return (
-    <div className="absolute inset-0 -z-10">
+      {/* School Info */}
       <motion.div
-        className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-700/20 rounded-full blur-3xl"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="flex flex-col items-center text-center mb-8"
+      >
+        <div className="w-24 h-24 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden mb-3">
+          {school.logo ? (
+            <Image
+              src={school.logo}
+              alt={school.name}
+              width={96}
+              height={96}
+              className="object-contain w-20 h-20"
+            />
+          ) : (
+            <span className={`text-3xl font-bold ${accentColor}`}>
+              {school.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+        </div>
+        <h1 className={`text-2xl font-bold ${accentColor}`}>{school.name}</h1>
+        <p className="text-gray-400 text-sm">{school.subdomain}.acadex.app</p>
+      </motion.div>
+
+      {/* Main card */}
       <motion.div
-        className="absolute bottom-[10%] right-[15%] w-[350px] h-[350px] bg-purple-700/20 rounded-full blur-3xl"
-        animate={{ scale: [1.2, 1, 1.2] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      />
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-[#181b2c]/90 backdrop-blur-md rounded-2xl p-8 w-full max-w-sm border border-white/10 shadow-lg"
+      >
+        {/* Tabs */}
+        {!isRegister && !isForgot && (
+          <div className="flex justify-center gap-6 mb-6">
+            <button
+              onClick={() => setIsAdmin(false)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+                !isAdmin
+                  ? "bg-white/5 border border-blue-500/50 text-blue-300"
+                  : "text-gray-400"
+              }`}
+            >
+              <GraduationCap size={16} /> Student
+            </button>
+            <button
+              onClick={() => setIsAdmin(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+                isAdmin
+                  ? "bg-white/5 border border-blue-500/50 text-blue-300"
+                  : "text-gray-400"
+              }`}
+            >
+              <ShieldCheck size={16} /> Admin
+            </button>
+          </div>
+        )}
+
+        <AnimatePresence mode="wait">
+          {/* LOGIN */}
+          {!isRegister && !isForgot && (
+            <motion.form
+              key="login"
+              onSubmit={handleLogin}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={form.email}
+                onChange={handleChange}
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={form.password}
+                onChange={handleChange}
+              />
+              <div className="text-right text-xs text-gray-400">
+                <span
+                  onClick={() => setIsForgot(true)}
+                  className="cursor-pointer text-blue-400 hover:underline"
+                >
+                  Forgot Password?
+                </span>
+              </div>
+
+              {message && (
+                <p className="text-center text-sm text-red-400">{message}</p>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full mt-2 flex items-center justify-center gap-2 ${btnColor} text-white py-3 rounded-xl transition-all`}
+              >
+                <LogIn size={16} />
+                {loading ? "Logging in..." : "Login"}
+              </button>
+              {!isAdmin && (
+                <p className="text-center text-xs mt-3 text-gray-400">
+                  Don’t have an account?{" "}
+                  <span
+                    onClick={() => setIsRegister(true)}
+                    className="text-blue-400 cursor-pointer hover:underline"
+                  >
+                    Register
+                  </span>
+                </p>
+              )}
+            </motion.form>
+          )}
+
+          {/* FORGOT PASSWORD */}
+          {isForgot && (
+            <motion.form
+              key="forgot"
+              onSubmit={handleForgot}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <p className="text-sm text-gray-400">
+                Enter your email to receive a password reset link.
+              </p>
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                value={form.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500"
+              />
+              {message && (
+                <p className="text-center text-sm text-red-400">{message}</p>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-2 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition-all"
+              >
+                <Mail size={16} />
+                {loading ? "Sending..." : "Send Reset Link"}
+              </button>
+              <p className="text-center text-xs mt-3 text-gray-400">
+                <span
+                  onClick={() => setIsForgot(false)}
+                  className="text-blue-400 cursor-pointer hover:underline"
+                >
+                  Back to Login
+                </span>
+              </p>
+            </motion.form>
+          )}
+
+          {/* REGISTER */}
+          {isRegister && (
+            <motion.div
+              key="register"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              {/* Step Tabs */}
+              <div className="flex justify-between mb-4 text-xs text-gray-400">
+                <button
+                  onClick={() => setStep(1)}
+                  className={`px-3 py-1 rounded-full ${
+                    step === 1
+                      ? "bg-blue-500/20 text-blue-300"
+                      : "hover:text-blue-300"
+                  }`}
+                >
+                  Personal
+                </button>
+                <button
+                  onClick={() => setStep(2)}
+                  className={`px-3 py-1 rounded-full ${
+                    step === 2
+                      ? "bg-blue-500/20 text-blue-300"
+                      : "hover:text-blue-300"
+                  }`}
+                >
+                  Academic
+                </button>
+                <button
+                  onClick={() => setStep(3)}
+                  className={`px-3 py-1 rounded-full ${
+                    step === 3
+                      ? "bg-blue-500/20 text-blue-300"
+                      : "hover:text-blue-300"
+                  }`}
+                >
+                  Account
+                </button>
+              </div>
+
+              <form onSubmit={handleRegister} className="space-y-3">
+                {/* STEP 1 — PERSONAL INFO */}
+                {step === 1 && (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        name="firstName"
+                        placeholder="First Name"
+                        value={form.firstName}
+                        onChange={handleChange}
+                        className="px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                      />
+                      <input
+                        type="text"
+                        name="lastName"
+                        placeholder="Last Name"
+                        value={form.lastName}
+                        onChange={handleChange}
+                        className="px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                      />
+                    </div>
+                    <select
+                      name="gender"
+                      value={form.gender}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                    <input
+                      type="date"
+                      name="dob"
+                      value={form.dob}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    />
+                    <input
+                      type="text"
+                      name="contactNumber"
+                      placeholder="Phone / Contact Number"
+                      value={form.contactNumber}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    />
+                    <input
+                      type="text"
+                      name="admissionNo"
+                      placeholder="Admission Number"
+                      value={form.admissionNo}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    />
+                  </>
+                )}
+
+                {/* STEP 2 — ACADEMIC INFO */}
+                {step === 2 && (
+                  <>
+                    <select
+                      name="department"
+                      value={form.department}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.name}>
+                          {d.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* For tertiary */}
+                    {school.schoolType === "TERTIARY" && (
+                      <>
+                        <select
+                          name="level"
+                          value={form.level}
+                          onChange={handleChange}
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                        >
+                          <option value="">Select Level</option>
+                          <option value="100 Level">100 Level</option>
+                          <option value="200 Level">200 Level</option>
+                          <option value="300 Level">300 Level</option>
+                          <option value="400 Level">400 Level</option>
+                        </select>
+                        <select
+                          name="semester"
+                          value={form.semester}
+                          onChange={handleChange}
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                        >
+                          <option value="">Select Semester</option>
+                          <option value="First Semester">First Semester</option>
+                          <option value="Second Semester">
+                            Second Semester
+                          </option>
+                        </select>
+                      </>
+                    )}
+
+                    {/* For high school */}
+                    {school.schoolType === "HIGH_SCHOOL" && (
+                      <>
+                        <input
+                          type="text"
+                          name="class"
+                          placeholder="e.g. SS1, SS2, SS3"
+                          value={form.class}
+                          onChange={handleChange}
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                        />
+                        <select
+                          name="term"
+                          value={form.term}
+                          onChange={handleChange}
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                        >
+                          <option value="">Select Term</option>
+                          <option value="First Term">First Term</option>
+                          <option value="Second Term">Second Term</option>
+                          <option value="Third Term">Third Term</option>
+                        </select>
+                      </>
+                    )}
+
+                    <input
+                      type="text"
+                      name="academicYear"
+                      placeholder="Academic Year (e.g. 2024/2025)"
+                      value={form.academicYear}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    />
+                  </>
+                )}
+
+                {/* STEP 3 — ACCOUNT INFO */}
+                {step === 3 && (
+                  <>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      value={form.email}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    />
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      value={form.password}
+                      onChange={handleChange}
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                    />
+                  </>
+                )}
+
+                {message && (
+                  <p className="text-center text-sm text-red-400">{message}</p>
+                )}
+                <button
+                  type={step < 3 ? "button" : "submit"}
+                  onClick={() => (step < 3 ? setStep(step + 1) : null)}
+                  className={`w-full mt-2 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition-all`}
+                >
+                  {step < 3 ? "Next →" : "Register"}
+                </button>
+                {step > 1 && (
+                  <p
+                    onClick={() => setStep(step - 1)}
+                    className="text-center text-xs text-blue-400 cursor-pointer hover:underline"
+                  >
+                    ← Back
+                  </p>
+                )}
+                {step === 3 && (
+                  <p className="text-center text-xs mt-3 text-gray-400">
+                    Already have an account?{" "}
+                    <span
+                      onClick={() => setIsRegister(false)}
+                      className="text-blue-400 cursor-pointer hover:underline"
+                    >
+                      Login
+                    </span>
+                  </p>
+                )}
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      <footer className="mt-10 text-xs text-gray-500">
+        Powered by{" "}
+        <span className="text-blue-400 font-semibold">AxWEB Technologies</span>
+      </footer>
     </div>
   );
 }
