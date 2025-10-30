@@ -17,8 +17,8 @@ export async function fetchJSON(path: string) {
     }
 
     return await res.json();
-  } catch (err: any) {
-    console.error("🚨 Network error:", err.message);
+  } catch (err: unknown) {
+    console.error("🚨 Network error:", err instanceof Error ? err.message : String(err));
     throw err;
   }
 }

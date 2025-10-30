@@ -9,6 +9,7 @@ import {
   School as SchoolIcon,
   MonitorSmartphone,
 } from "lucide-react";
+import Image from "next/image";
 
 interface School {
   id: number;
@@ -55,12 +56,28 @@ export default function SelectSchoolPage() {
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden px-4 py-8 sm:py-12">
       <GradientGlow />
 
+      {/* 🔹 AcadeX Text Logo (top left) */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
+      >
+        <a
+          href="/"
+          className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
+        >
+          <span className="text-blue-400">Acade</span>
+          <span className="text-white">X</span>
+        </a>
+      </motion.div>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-6 sm:mb-10 z-10"
+        className="text-center mb-6 sm:mb-10 z-10 mt-1 sm:mt-4"
       >
         <h1 className="text-2xl sm:text-4xl font-bold text-blue-400 mb-1 sm:mb-2">
           🎓 Select Your School Portal
@@ -123,9 +140,11 @@ export default function SelectSchoolPage() {
                 transition={{ duration: 8, repeat: Infinity }}
               >
                 {school.logo ? (
-                  <img
+                  <Image
                     src={school.logo}
                     alt={school.name}
+                    width={112}
+                    height={112}
                     className="w-28 h-28 object-contain grayscale"
                   />
                 ) : (
@@ -138,9 +157,11 @@ export default function SelectSchoolPage() {
               {/* Foreground content */}
               <div className="relative z-10 flex flex-col items-center text-center space-y-3">
                 {school.logo ? (
-                  <img
+                  <Image
                     src={school.logo}
                     alt={school.name}
+                    width={64}
+                    height={64}
                     className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border border-blue-700 object-cover shadow-md"
                   />
                 ) : (
