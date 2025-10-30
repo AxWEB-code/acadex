@@ -14,7 +14,7 @@ export default function Navbar() {
     { name: "Features", href: "#features" },
     { name: "Faq", href: "#faq" },
     { name: "Contact", href: "#contact" },
-    { name: "Portal", href: "/portal" },
+    { name: "Portal", href: "/select-school" },
   ];
 
   useEffect(() => {
