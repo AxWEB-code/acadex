@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   ArrowLeft,
   Mail,
-  KeyRound,
 } from "lucide-react";
 import Link from "next/link";
 import { fetchJSON } from "@/lib/api";
@@ -21,7 +20,7 @@ export default function PortalLoginPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   const [departments, setDepartments] = useState<any[]>([]);
-  const [step, setStep] = useState(1); // form tab
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -48,7 +47,7 @@ export default function PortalLoginPage() {
       const s = JSON.parse(stored);
       setSchool(s);
       loadDepartments(s.id);
-    } else window.location.href = "/schools";
+    } else window.location.href = "/select-school";
   }, []);
 
   const loadDepartments = async (id: number) => {
@@ -153,7 +152,6 @@ export default function PortalLoginPage() {
 
   if (!school) return null;
 
-  // 🎨 use original blue/purple glow theme for both; admin slightly darker
   const bgColors = isAdmin
     ? "from-[#0a0a0f] via-[#0c0c14] to-[#0f1620]"
     : "from-[#0a0a0f] via-[#0c0c15] to-[#111827]";
@@ -167,10 +165,10 @@ export default function PortalLoginPage() {
       {/* 🌫 Floating breadcrumb */}
       <div className="fixed top-5 left-5 z-50">
         <Link
-          href="/schools"
+          href="/select-school"
           className="flex items-center gap-2 bg-white/10 backdrop-blur-lg border border-white/10 px-3 py-2 rounded-full text-gray-300 hover:text-blue-400 text-sm shadow-md transition"
         >
-          <ArrowLeft size={16} /> Back to Schools
+          <ArrowLeft size={16} /> Back to School Selection
         </Link>
       </div>
 
@@ -218,14 +216,14 @@ export default function PortalLoginPage() {
         <p className="text-gray-400 text-sm">{school.subdomain}.acadex.app</p>
       </motion.div>
 
-      {/* Main card */}
+      {/* Main Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="bg-[#181b2c]/90 backdrop-blur-md rounded-2xl p-8 w-full max-w-sm border border-white/10 shadow-lg"
       >
-        {/* Tabs */}
+        {/* Toggle Tabs */}
         {!isRegister && !isForgot && (
           <div className="flex justify-center gap-6 mb-6">
             <button
@@ -267,7 +265,7 @@ export default function PortalLoginPage() {
                 type="email"
                 name="email"
                 placeholder="Email"
-                className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500"
                 value={form.email}
                 onChange={handleChange}
               />
@@ -275,7 +273,7 @@ export default function PortalLoginPage() {
                 type="password"
                 name="password"
                 placeholder="Password"
-                className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500"
                 value={form.password}
                 onChange={handleChange}
               />
@@ -357,7 +355,7 @@ export default function PortalLoginPage() {
             </motion.form>
           )}
 
-          {/* REGISTER */}
+          {/* REGISTER WITH PROGRESS BAR */}
           {isRegister && (
             <motion.div
               key="register"
@@ -367,42 +365,34 @@ export default function PortalLoginPage() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
-              {/* Step Tabs */}
-              <div className="flex justify-between mb-4 text-xs text-gray-400">
-                <button
-                  onClick={() => setStep(1)}
-                  className={`px-3 py-1 rounded-full ${
-                    step === 1
-                      ? "bg-blue-500/20 text-blue-300"
-                      : "hover:text-blue-300"
-                  }`}
-                >
-                  Personal
-                </button>
-                <button
-                  onClick={() => setStep(2)}
-                  className={`px-3 py-1 rounded-full ${
-                    step === 2
-                      ? "bg-blue-500/20 text-blue-300"
-                      : "hover:text-blue-300"
-                  }`}
-                >
-                  Academic
-                </button>
-                <button
-                  onClick={() => setStep(3)}
-                  className={`px-3 py-1 rounded-full ${
-                    step === 3
-                      ? "bg-blue-500/20 text-blue-300"
-                      : "hover:text-blue-300"
-                  }`}
-                >
-                  Account
-                </button>
+              {/* Progress Bar */}
+              <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-4">
+                <motion.div
+                  className="h-full bg-blue-500 rounded-full"
+                  animate={{ width: `${(step / 3) * 100}%` }}
+                  transition={{ duration: 0.3 }}
+                />
               </div>
 
+              {/* Step Tabs */}
+              <div className="flex justify-between mb-4 text-xs text-gray-400">
+                {["Personal", "Academic", "Account"].map((label, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setStep(i + 1)}
+                    className={`px-3 py-1 rounded-full ${
+                      step === i + 1
+                        ? "bg-blue-500/20 text-blue-300"
+                        : "hover:text-blue-300"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* FORM SECTIONS */}
               <form onSubmit={handleRegister} className="space-y-3">
-                {/* STEP 1 — PERSONAL INFO */}
                 {step === 1 && (
                   <>
                     <div className="grid grid-cols-2 gap-2">
@@ -427,7 +417,7 @@ export default function PortalLoginPage() {
                       name="gender"
                       value={form.gender}
                       onChange={handleChange}
-                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
@@ -459,14 +449,13 @@ export default function PortalLoginPage() {
                   </>
                 )}
 
-                {/* STEP 2 — ACADEMIC INFO */}
                 {step === 2 && (
                   <>
                     <select
                       name="department"
                       value={form.department}
                       onChange={handleChange}
-                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Select Department</option>
                       {departments.map((d) => (
@@ -476,14 +465,13 @@ export default function PortalLoginPage() {
                       ))}
                     </select>
 
-                    {/* For tertiary */}
-                    {school.schoolType === "TERTIARY" && (
+                    {school.schoolType === "TERTIARY" ? (
                       <>
                         <select
                           name="level"
                           value={form.level}
                           onChange={handleChange}
-                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Level</option>
                           <option value="100 Level">100 Level</option>
@@ -495,7 +483,7 @@ export default function PortalLoginPage() {
                           name="semester"
                           value={form.semester}
                           onChange={handleChange}
-                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Semester</option>
                           <option value="First Semester">First Semester</option>
@@ -504,10 +492,7 @@ export default function PortalLoginPage() {
                           </option>
                         </select>
                       </>
-                    )}
-
-                    {/* For high school */}
-                    {school.schoolType === "HIGH_SCHOOL" && (
+                    ) : (
                       <>
                         <input
                           type="text"
@@ -521,7 +506,7 @@ export default function PortalLoginPage() {
                           name="term"
                           value={form.term}
                           onChange={handleChange}
-                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
+                          className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Term</option>
                           <option value="First Term">First Term</option>
@@ -542,7 +527,6 @@ export default function PortalLoginPage() {
                   </>
                 )}
 
-                {/* STEP 3 — ACCOUNT INFO */}
                 {step === 3 && (
                   <>
                     <input
@@ -567,21 +551,15 @@ export default function PortalLoginPage() {
                 {message && (
                   <p className="text-center text-sm text-red-400">{message}</p>
                 )}
+
                 <button
                   type={step < 3 ? "button" : "submit"}
-                  onClick={() => (step < 3 ? setStep(step + 1) : null)}
+                  onClick={() => step < 3 && setStep(step + 1)}
                   className={`w-full mt-2 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition-all`}
                 >
                   {step < 3 ? "Next →" : "Register"}
                 </button>
-                {step > 1 && (
-                  <p
-                    onClick={() => setStep(step - 1)}
-                    className="text-center text-xs text-blue-400 cursor-pointer hover:underline"
-                  >
-                    ← Back
-                  </p>
-                )}
+
                 {step === 3 && (
                   <p className="text-center text-xs mt-3 text-gray-400">
                     Already have an account?{" "}

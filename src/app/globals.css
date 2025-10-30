@@ -29,3 +29,10 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+
+/* In globals.css or tailwind.css */
+select option {
+  background-color: #0f1620; /* dark background */
+  color: #fff; /* white text */
+}
