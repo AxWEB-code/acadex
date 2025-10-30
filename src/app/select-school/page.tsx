@@ -55,40 +55,41 @@ export default function SelectSchoolPage() {
   }, [search, schools]);
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden px-4 py-8 sm:py-12">
-      <GradientGlow />
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center sm:justify-center justify-start bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden px-4 pt-6 sm:pt-10 pb-6">
+  <GradientGlow />
 
-      {/* 🔹 AcadeX Text Logo (top left) */}
-<motion.div
-  initial={{ opacity: 0, y: -10 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
->
-  <Link
-    href="/"
-    className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
+  {/* 🔹 AcadeX Text Logo (top left) */}
+  <motion.div
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6 }}
+    className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
   >
-    <span className="text-blue-400">Acade</span>
-    <span className="text-white">X</span>
-  </Link>
+    <Link
+      href="/"
+      className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
+    >
+      <span className="text-blue-400">Acade</span>
+      <span className="text-white">X</span>
+    </Link>
+  </motion.div>
+
+  {/* Header */}
+<motion.div
+  initial={{ opacity: 0, y: -15 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className="text-center mb-6 sm:mb-10 z-10 mt-[120px] sm:mt-10"
+>
+  <h1 className="text-2xl sm:text-4xl font-bold text-blue-400 mb-1 sm:mb-2">
+    🎓 Select Your School Portal
+  </h1>
+  <p className="text-gray-400 text-sm sm:text-base">
+    Choose your institution to continue to your login page
+  </p>
 </motion.div>
 
 
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-6 sm:mb-10 z-10 mt-1 sm:mt-4"
-      >
-        <h1 className="text-2xl sm:text-4xl font-bold text-blue-400 mb-1 sm:mb-2">
-          🎓 Select Your School Portal
-        </h1>
-        <p className="text-gray-400 text-sm sm:text-base">
-          Choose your institution to continue to your login page
-        </p>
-      </motion.div>
 
       {/* Search Bar */}
       <motion.div
