@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link"; // ✅ add this import
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { fetchJSON } from "@/lib/api";
 import {
@@ -10,7 +10,6 @@ import {
   School as SchoolIcon,
   MonitorSmartphone,
 } from "lucide-react";
-
 import Image from "next/image";
 
 interface School {
@@ -55,41 +54,39 @@ export default function SelectSchoolPage() {
   }, [search, schools]);
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center sm:justify-center justify-start bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-hidden px-4 pt-6 sm:pt-10 pb-6">
-  <GradientGlow />
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center sm:justify-center justify-start bg-gradient-to-b from-[#0a0a0f] via-[#0c0c15] to-[#111827] text-white overflow-x-hidden px-4 pt-6 sm:pt-10 pb-6 scroll-smooth">
+      <GradientGlow />
 
-  {/* 🔹 AcadeX Text Logo (top left) */}
-  <motion.div
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }}
-    className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
-  >
-    <Link
-      href="/"
-      className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
-    >
-      <span className="text-blue-400">Acade</span>
-      <span className="text-white">X</span>
-    </Link>
-  </motion.div>
+      {/* 🔹 AcadeX Text Logo (top left) */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
+      >
+        <Link
+          href="/"
+          className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
+        >
+          <span className="text-blue-400">Acade</span>
+          <span className="text-white">X</span>
+        </Link>
+      </motion.div>
 
-  {/* Header */}
-<motion.div
-  initial={{ opacity: 0, y: -15 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
-  className="text-center mb-6 sm:mb-10 z-10 mt-[120px] sm:mt-10"
->
-  <h1 className="text-2xl sm:text-4xl font-bold text-blue-400 mb-1 sm:mb-2">
-    🎓 Select Your School Portal
-  </h1>
-  <p className="text-gray-400 text-sm sm:text-base">
-    Choose your institution to continue to your login page
-  </p>
-</motion.div>
-
-
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center mb-6 sm:mb-10 z-10 mt-[120px] sm:mt-10"
+      >
+        <h1 className="text-2xl sm:text-4xl font-bold text-blue-400 mb-1 sm:mb-2">
+          🎓 Select Your School Portal
+        </h1>
+        <p className="text-gray-400 text-sm sm:text-base">
+          Choose your institution to continue to your login page
+        </p>
+      </motion.div>
 
       {/* Search Bar */}
       <motion.div
@@ -123,25 +120,30 @@ export default function SelectSchoolPage() {
           filtered.map((school) => (
             <motion.div
               key={school.id}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.4 }}
               whileHover={{
                 y: -4,
                 scale: 1.03,
                 boxShadow: "0 0 25px rgba(59,130,246,0.25)",
               }}
-              transition={{ duration: 0.25 }}
               onClick={() => {
                 localStorage.setItem("selectedSchool", JSON.stringify(school));
                 window.location.href = "/portal";
               }}
               className={`relative cursor-pointer bg-[#181b2c]/95 rounded-2xl p-5 sm:p-6 backdrop-blur-md border ${getBorderColor(
                 school.status
-              )} transition-all duration-300 overflow-hidden`}
+              )} transition-all duration-300 overflow-hidden will-change-transform`}
             >
               {/* faint background logo */}
               <motion.div
                 className="absolute inset-0 flex items-center justify-center opacity-[0.12] z-0 pointer-events-none"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 8, repeat: Infinity }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 0.12 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
               >
                 {school.logo ? (
                   <Image
@@ -149,6 +151,7 @@ export default function SelectSchoolPage() {
                     alt={school.name}
                     width={112}
                     height={112}
+                    loading="eager"
                     className="w-28 h-28 object-contain grayscale"
                   />
                 ) : (
@@ -166,6 +169,7 @@ export default function SelectSchoolPage() {
                     alt={school.name}
                     width={64}
                     height={64}
+                    loading="eager"
                     className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border border-blue-700 object-cover shadow-md"
                   />
                 ) : (
@@ -268,16 +272,16 @@ function getBorderColor(status?: string | null) {
 /* glow background */
 function GradientGlow() {
   return (
-    <div className="absolute inset-0 -z-10">
+    <div className="absolute inset-0 -z-10 will-change-transform">
       <motion.div
         className="absolute top-[25%] left-[10%] w-[300px] h-[300px] bg-blue-700/25 rounded-full blur-3xl"
-        animate={{ scale: [1, 1.15, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-[10%] right-[15%] w-[350px] h-[350px] bg-purple-700/25 rounded-full blur-3xl"
-        animate={{ scale: [1.05, 1.25, 1.05] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );
