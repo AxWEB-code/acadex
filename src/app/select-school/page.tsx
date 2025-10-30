@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link"; // ✅ add this import
 import { motion } from "framer-motion";
 import { fetchJSON } from "@/lib/api";
 import {
@@ -9,6 +10,7 @@ import {
   School as SchoolIcon,
   MonitorSmartphone,
 } from "lucide-react";
+
 import Image from "next/image";
 
 interface School {
@@ -57,20 +59,21 @@ export default function SelectSchoolPage() {
       <GradientGlow />
 
       {/* 🔹 AcadeX Text Logo (top left) */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
-      >
-        <a
-          href="/"
-          className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
-        >
-          <span className="text-blue-400">Acade</span>
-          <span className="text-white">X</span>
-        </a>
-      </motion.div>
+<motion.div
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+  className="absolute top-5 left-5 sm:top-8 sm:left-8 z-20 select-none"
+>
+  <Link
+    href="/"
+    className="flex items-center gap-1 text-white font-extrabold text-lg sm:text-2xl tracking-wide"
+  >
+    <span className="text-blue-400">Acade</span>
+    <span className="text-white">X</span>
+  </Link>
+</motion.div>
+
 
       {/* Header */}
       <motion.div
