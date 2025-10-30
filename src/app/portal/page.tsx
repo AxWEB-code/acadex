@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   ArrowLeft,
   Mail,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { fetchJSON } from "@/lib/api";
@@ -19,9 +20,12 @@ export default function PortalLoginPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
+  const [showSchoolCodeModal, setShowSchoolCodeModal] = useState(false);
+  const [schoolCode, setSchoolCode] = useState("");
   const [departments, setDepartments] = useState<any[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const [form, setForm] = useState({
@@ -46,9 +50,20 @@ export default function PortalLoginPage() {
     if (stored) {
       const s = JSON.parse(stored);
       setSchool(s);
-      loadDepartments(s.id);
-    } else window.location.href = "/select-school";
+      if (s.schoolType === "TERTIARY") {
+        loadDepartments(s.id);
+      }
+    } else {
+      window.location.href = "/select-school";
+    }
   }, []);
+
+  // Show school code modal when registration is clicked
+  useEffect(() => {
+    if (isRegister && !isAdmin) {
+      setShowSchoolCodeModal(true);
+    }
+  }, [isRegister, isAdmin]);
 
   const loadDepartments = async (id: number) => {
     try {
@@ -56,6 +71,52 @@ export default function PortalLoginPage() {
       setDepartments(res || []);
     } catch {
       setDepartments([]);
+    }
+  };
+
+  const verifySchoolCode = async (code: string): Promise<boolean> => {
+  try {
+    const response = await fetchJSON("/api/schools/verify-code", {
+      method: "POST",
+      body: JSON.stringify({
+        schoolCode: code,
+        schoolId: school?.id,
+      }),
+    });
+    
+    return response.isValid === true;
+  } catch (error) {
+    console.error("Error verifying school code:", error);
+    return false;
+  }
+};
+
+  const handleSchoolCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!schoolCode.trim()) {
+      setMessage("Please enter your school code");
+      return;
+    }
+
+    setModalLoading(true);
+    setMessage("");
+
+    try {
+      const isValid = await verifySchoolCode(schoolCode);
+      
+      if (isValid) {
+        setShowSchoolCodeModal(false);
+        setMessage("");
+        // School code verified, continue with registration
+      } else {
+        setMessage("❌ Invalid school code. Please check with your institution and try again.");
+        // Keep the modal open for retry
+      }
+    } catch (error) {
+      setMessage("❌ Verification failed. Please try again.");
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -162,8 +223,104 @@ export default function PortalLoginPage() {
     <div
       className={`min-h-screen flex flex-col items-center justify-center bg-gradient-to-b ${bgColors} text-white px-6 py-10 overflow-hidden relative`}
     >
+      {/* School Code Modal */}
+      <AnimatePresence>
+        {showSchoolCodeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#181b2c] border border-white/10 rounded-2xl p-6 w-full max-w-md"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-blue-400">
+                  School Verification
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowSchoolCodeModal(false);
+                    setIsRegister(false);
+                    setSchoolCode("");
+                    setMessage("");
+                  }}
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <p className="text-gray-300 text-sm mb-4">
+                Please enter your school code to continue with registration. 
+                This ensures you're registering for the correct school.
+              </p>
+
+              <form onSubmit={handleSchoolCodeSubmit} className="space-y-4">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="SCH-ECNS-9466"
+                    value={schoolCode}
+                    onChange={(e) => setSchoolCode(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400"
+                    disabled={modalLoading}
+                  />
+                  <p className="text-xs text-gray-400 mt-2">
+                    Your school code should be provided by your institution
+                  </p>
+                </div>
+
+                {message && (
+                  <p className={`text-center text-sm ${
+                    message.includes("❌") ? "text-red-400" : "text-green-400"
+                  }`}>
+                    {message}
+                  </p>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowSchoolCodeModal(false);
+                      setIsRegister(false);
+                      setSchoolCode("");
+                      setMessage("");
+                    }}
+                    disabled={modalLoading}
+                    className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/10 text-gray-300 hover:bg-white/20 transition disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={modalLoading || !schoolCode.trim()}
+                    className="flex-1 px-4 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {modalLoading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Verifying...
+                      </div>
+                    ) : (
+                      "Verify & Continue"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Rest of your existing code remains the same */}
       {/* 🌫 Floating breadcrumb */}
-      <div className="fixed top-5 left-5 z-50">
+      <div className="fixed top-5 left-5 z-40">
         <Link
           href="/select-school"
           className="flex items-center gap-2 bg-white/10 backdrop-blur-lg border border-white/10 px-3 py-2 rounded-full text-gray-300 hover:text-blue-400 text-sm shadow-md transition"
@@ -299,7 +456,7 @@ export default function PortalLoginPage() {
               </button>
               {!isAdmin && (
                 <p className="text-center text-xs mt-3 text-gray-400">
-                  Don’t have an account?{" "}
+                  Don't have an account?{" "}
                   <span
                     onClick={() => setIsRegister(true)}
                     className="text-blue-400 cursor-pointer hover:underline"
@@ -356,7 +513,7 @@ export default function PortalLoginPage() {
           )}
 
           {/* REGISTER WITH PROGRESS BAR */}
-          {isRegister && (
+          {isRegister && !showSchoolCodeModal && (
             <motion.div
               key="register"
               initial={{ opacity: 0, y: 10 }}
@@ -451,19 +608,22 @@ export default function PortalLoginPage() {
 
                 {step === 2 && (
                   <>
-                    <select
-                      name="department"
-                      value={form.department}
-                      onChange={handleChange}
-                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map((d) => (
-                        <option key={d.id} value={d.name}>
-                          {d.name}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Department selection - ONLY for tertiary schools */}
+                    {school.schoolType === "TERTIARY" && (
+                      <select
+                        name="department"
+                        value={form.department}
+                        onChange={handleChange}
+                        className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Department</option>
+                        {departments.map((d) => (
+                          <option key={d.id} value={d.name}>
+                            {d.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
 
                     {school.schoolType === "TERTIARY" ? (
                       <>
