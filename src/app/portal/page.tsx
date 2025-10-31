@@ -10,6 +10,8 @@ import {
   ArrowLeft,
   Mail,
   X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import Link from "next/link";
 import { fetchJSON } from "@/lib/api";
@@ -40,6 +42,8 @@ export default function PortalLoginPage() {
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -457,14 +461,23 @@ export default function PortalLoginPage() {
                 value={form.email}
                 onChange={handleChange}
               />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500"
-                value={form.password}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 pr-10"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 transition"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               <div className="text-right text-xs text-gray-400">
                 <span
                   onClick={() => setIsForgot(true)}
@@ -728,14 +741,23 @@ export default function PortalLoginPage() {
                       onChange={handleChange}
                       className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
                     />
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      value={form.password}
-                      onChange={handleChange}
-                      className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showRegisterPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                        className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 transition"
+                      >
+                        {showRegisterPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </>
                 )}
 
