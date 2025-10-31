@@ -89,10 +89,11 @@ export default function PortalLoginPage() {
 
   const verifySchoolCode = async (code: string): Promise<boolean> => {
   try {
-    console.log("🔍 [FRONTEND] Sending verification request:", {
+    console.log("🔍 [FRONTEND DEBUG] Starting verification...", {
       enteredCode: code,
       schoolId: school?.id,
-      schoolName: school?.name
+      schoolName: school?.name,
+      schoolSubdomain: school?.subdomain
     });
 
     const response = await fetchJSON("/schools/verify-code", {
@@ -103,10 +104,19 @@ export default function PortalLoginPage() {
       }),
     });
 
-    console.log("✅ [FRONTEND] Received response:", response);
-    return response.isValid === true;
+    console.log("🔍 [FRONTEND DEBUG] Full API response:", response);
+    
+    if (response.isValid === true) {
+      console.log("✅ [FRONTEND DEBUG] Code is VALID!");
+      return true;
+    } else {
+      console.log("❌ [FRONTEND DEBUG] Code is INVALID according to backend");
+      console.log("🔍 [FRONTEND DEBUG] Response details:", response);
+      return false;
+    }
   } catch (error) {
-    console.error("❌ [FRONTEND] Request failed:", error instanceof Error ? error.message : String(error));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("❌ [FRONTEND DEBUG] Request failed:", errorMessage);
     return false;
   }
 };
