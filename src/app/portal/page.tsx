@@ -89,20 +89,24 @@ export default function PortalLoginPage() {
 
   const verifySchoolCode = async (code: string): Promise<boolean> => {
   try {
-    console.log("🔍 Verifying school code:", code, "for school:", school?.id);
-    
+    console.log("🔍 [FRONTEND] Sending verification request:", {
+      enteredCode: code,
+      schoolId: school?.id,
+      schoolName: school?.name
+    });
+
     const response = await fetchJSON("/schools/verify-code", {
       method: "POST",
       body: JSON.stringify({
-        schoolCode: code,
+        schoolCode: code.trim().toUpperCase(),
         schoolId: school?.id,
       }),
     });
-    
-    console.log("✅ Verification response:", response);
+
+    console.log("✅ [FRONTEND] Received response:", response);
     return response.isValid === true;
-  } catch (error) {
-    console.error("❌ Error verifying school code:", error);
+  } catch (error: any) {
+    console.error("❌ [FRONTEND] Request failed:", error.message);
     return false;
   }
 };
