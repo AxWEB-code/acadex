@@ -89,7 +89,9 @@ export default function PortalLoginPage() {
 
   const verifySchoolCode = async (code: string): Promise<boolean> => {
   try {
-    const response = await fetchJSON("/api/schools/verify-code", {
+    console.log("🔍 Verifying school code:", code, "for school:", school?.id);
+    
+    const response = await fetchJSON("/schools/verify-code", {
       method: "POST",
       body: JSON.stringify({
         schoolCode: code,
@@ -97,9 +99,10 @@ export default function PortalLoginPage() {
       }),
     });
     
+    console.log("✅ Verification response:", response);
     return response.isValid === true;
-  } catch {
-    console.error("Error verifying school code");
+  } catch (error) {
+    console.error("❌ Error verifying school code:", error);
     return false;
   }
 };
