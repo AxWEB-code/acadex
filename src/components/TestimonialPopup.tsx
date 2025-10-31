@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Typed from "typed.js";
 
@@ -30,10 +30,10 @@ export default function TestimonialPopup() {
   const delayBetween = 12000;
 
   // choose a random bottom position (only side-to-side to avoid nav overlap)
-  const randomPosition = () => {
+  const randomPosition = useCallback(() => {
     const positions: typeof position[] = ["bottom-right", "bottom-left", "bottom-center"];
     setPosition(positions[Math.floor(Math.random() * positions.length)]);
-  };
+  }, []);
 
   // Fade-out after typing completes
   useEffect(() => {
