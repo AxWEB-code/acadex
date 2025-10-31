@@ -96,7 +96,7 @@ export default function PortalLoginPage() {
       schoolSubdomain: school?.subdomain
     });
 
-    const response = await fetchJSON("/schools/verify-code", {
+    const response = await fetchJSON("/api/schools/verify-code", {
       method: "POST",
       body: JSON.stringify({
         schoolCode: code.trim().toUpperCase(),
