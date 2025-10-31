@@ -37,7 +37,7 @@ export default function PortalLoginPage() {
   const [isForgot, setIsForgot] = useState(false);
   const [showSchoolCodeModal, setShowSchoolCodeModal] = useState(false);
   const [schoolCode, setSchoolCode] = useState("");
-  const [departments, setDepartments] = useState<Department[]>([]);
+  //const [departments, setDepartments] = useState<Department[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
@@ -257,9 +257,9 @@ export default function PortalLoginPage() {
       console.log("❌ [DEBUG] Registration failed with error:", res.error);
       setMessage(res.error || "Registration failed.");
     }
-  } catch (error: any) {
-    console.error("❌ [DEBUG] Registration request failed:", error);
-    console.error("❌ [DEBUG] Error message:", error.message);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("❌ [DEBUG] Registration request failed:", errorMessage);
     setMessage("Network error. Please try again.");
   } finally {
     setLoading(false);
