@@ -62,76 +62,65 @@ export default function PortalLoginPage() {
     contactNumber: "",
   });
 
-  // ADD THE loadDepartments FUNCTION
-  const loadDepartments = async (schoolId: number) => {
+  useEffect(() => {
+    const stored = localStorage.getItem("selectedSchool");
+    if (stored) {
+      const s = JSON.parse(stored);
+      setSchool(s);
+      if (s.schoolType === "TERTIARY") {
+        loadDepartments(s.id);
+      }
+    } else {
+      window.location.href = "/select-school";
+    }
+  }, []);
+
+  // Show school code modal when registration is clicked
+  useEffect(() => {
+    if (isRegister && !isAdmin) {
+      setShowSchoolCodeModal(true);
+    }
+  }, [isRegister, isAdmin]);
+
+  const loadDepartments = async (id: number) => {
     try {
-      console.log("🔍 [DEBUG] Loading departments for school:", schoolId);
-      const response = await fetchJSON(`/api/schools/${schoolId}/departments`);
-      console.log("🔍 [DEBUG] Departments response:", response);
-      setDepartments(response.departments || []);
-    } catch (error) {
-      console.error("❌ [DEBUG] Failed to load departments:", error);
+      const res = await fetchJSON(`/api/departments?schoolId=${id}`);
+      setDepartments(res || []);
+    } catch {
       setDepartments([]);
     }
   };
 
-  useEffect(() => {
-  const stored = localStorage.getItem("selectedSchool");
-  console.log("🔍 [DEBUG] Raw localStorage:", stored);
-  
-  if (stored) {
-    try {
-      const s = JSON.parse(stored);
-      console.log("🔍 [DEBUG] Parsed school object:", s);
-      console.log("🔍 [DEBUG] School subdomain:", s.subdomain);
-      console.log("🔍 [DEBUG] School ID:", s.id);
-      console.log("🔍 [DEBUG] School name:", s.name);
-      
-      setSchool(s);
-      if (s.schoolType === "TERTIARY") {
-        console.log("🔍 [DEBUG] Loading departments for school ID:", s.id);
-        loadDepartments(s.id);
-      }
-    } catch (error) {
-      console.error("❌ [DEBUG] Error parsing school from localStorage:", error);
-      window.location.href = "/select-school";
-    }
-  } else {
-    console.log("❌ [DEBUG] No school found in localStorage");
-    window.location.href = "/select-school";
-  }
-}, []);
-
   const verifySchoolCode = async (code: string): Promise<boolean> => {
   try {
-    console.log("🔍 [DEBUG] School object for verification:", school);
-    
-    if (!school?.id) {
-      console.error("❌ [DEBUG] No school ID available");
-      return false;
-    }
+    console.log("🔍 [FRONTEND DEBUG] Starting verification...", {
+      enteredCode: code,
+      schoolId: school?.id,
+      schoolName: school?.name,
+      schoolSubdomain: school?.subdomain
+    });
 
-    console.log("🔍 [DEBUG] Verifying code:", code, "for school ID:", school.id);
-    
     const response = await fetchJSON("/api/schools/verify-code", {
       method: "POST",
       body: JSON.stringify({
         schoolCode: code.trim().toUpperCase(),
-        schoolId: school.id, // Use the actual ID
+        schoolId: school?.id,
       }),
     });
 
-    console.log("🔍 [DEBUG] Verification API response:", response);
+    console.log("🔍 [FRONTEND DEBUG] Full API response:", response);
     
     if (response.isValid === true) {
-      console.log("✅ [DEBUG] Code is VALID!");
+      console.log("✅ [FRONTEND DEBUG] Code is VALID!");
       return true;
     } else {
-      console.log("❌ [DEBUG] Code is INVALID - backend returned false");
+      console.log("❌ [FRONTEND DEBUG] Code is INVALID according to backend");
+      console.log("🔍 [FRONTEND DEBUG] Response details:", response);
       return false;
     }
   } catch (error) {
-    console.error("❌ [DEBUG] Verification request failed:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("❌ [FRONTEND DEBUG] Request failed:", errorMessage);
     return false;
   }
 };
@@ -236,43 +225,31 @@ export default function PortalLoginPage() {
   setMessage("");
 
   try {
-    console.log("📤 [DEBUG] Registration - school object:", school);
-    console.log("📤 [DEBUG] Registration - using subdomain:", school?.subdomain);
-
-    const registrationData = {
+    console.log("📤 [FRONTEND] Sending registration data:", {
       ...form,
       schoolSubdomain: school?.subdomain,
-    };
-
-    console.log("📤 [DEBUG] Full registration data:", {
-      ...registrationData,
       password: "***" // Don't log actual password
     });
 
     const res = await fetchJSON("/api/students/register", {
       method: "POST",
-      body: JSON.stringify(registrationData),
+      body: JSON.stringify({
+        ...form,
+        schoolSubdomain: school?.subdomain,
+      }),
     });
 
-    console.log("📥 [DEBUG] Registration API response:", res);
+    console.log("📥 [FRONTEND] Registration response:", res);
 
     if (res.student) {
       setMessage("✅ Registration successful! You can now log in.");
       setIsRegister(false);
       setStep(1);
-      // Clear form
-      setForm({
-        firstName: "", lastName: "", email: "", gender: "", password: "",
-        dob: "", admissionNo: "", department: "", level: "", class: "",
-        semester: "", term: "", academicYear: "", contactNumber: "",
-      });
     } else {
-      console.log("❌ [DEBUG] Registration failed with error:", res.error);
       setMessage(res.error || "Registration failed.");
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("❌ [DEBUG] Registration request failed:", errorMessage);
+    console.error("❌ [FRONTEND] Registration error:", error);
     setMessage("Network error. Please try again.");
   } finally {
     setLoading(false);
