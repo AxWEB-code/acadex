@@ -37,7 +37,7 @@ export default function PortalLoginPage() {
   const [isForgot, setIsForgot] = useState(false);
   const [showSchoolCodeModal, setShowSchoolCodeModal] = useState(false);
   const [schoolCode, setSchoolCode] = useState("");
-  //const [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
@@ -61,6 +61,19 @@ export default function PortalLoginPage() {
     academicYear: "",
     contactNumber: "",
   });
+
+  // ADD THE loadDepartments FUNCTION
+  const loadDepartments = async (schoolId: number) => {
+    try {
+      console.log("🔍 [DEBUG] Loading departments for school:", schoolId);
+      const response = await fetchJSON(`/api/schools/${schoolId}/departments`);
+      console.log("🔍 [DEBUG] Departments response:", response);
+      setDepartments(response.departments || []);
+    } catch (error) {
+      console.error("❌ [DEBUG] Failed to load departments:", error);
+      setDepartments([]);
+    }
+  };
 
   useEffect(() => {
   const stored = localStorage.getItem("selectedSchool");
