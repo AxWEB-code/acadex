@@ -5,7 +5,6 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LogIn,
-  UserPlus,
   GraduationCap,
   ShieldCheck,
   ArrowLeft,
@@ -15,14 +14,28 @@ import {
 import Link from "next/link";
 import { fetchJSON } from "@/lib/api";
 
+// Define proper types to replace 'any'
+interface School {
+  id: number;
+  name: string;
+  subdomain: string;
+  logo?: string;
+  schoolType: string;
+}
+
+interface Department {
+  id: number;
+  name: string;
+}
+
 export default function PortalLoginPage() {
-  const [school, setSchool] = useState<any>(null);
+  const [school, setSchool] = useState<School | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   const [showSchoolCodeModal, setShowSchoolCodeModal] = useState(false);
   const [schoolCode, setSchoolCode] = useState("");
-  const [departments, setDepartments] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
@@ -75,21 +88,21 @@ export default function PortalLoginPage() {
   };
 
   const verifySchoolCode = async (code: string): Promise<boolean> => {
-  try {
-    const response = await fetchJSON("/api/schools/verify-code", {
-      method: "POST",
-      body: JSON.stringify({
-        schoolCode: code,
-        schoolId: school?.id,
-      }),
-    });
-    
-    return response.isValid === true;
-  } catch (error) {
-    console.error("Error verifying school code:", error);
-    return false;
-  }
-};
+    try {
+      const response = await fetchJSON("/api/schools/verify-code", {
+        method: "POST",
+        body: JSON.stringify({
+          schoolCode: code,
+          schoolId: school?.id,
+        }),
+      });
+      
+      return response.isValid === true;
+    } catch (error) {
+      console.error("Error verifying school code:", error);
+      return false;
+    }
+  };
 
   const handleSchoolCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,10 +133,12 @@ export default function PortalLoginPage() {
     }
   };
 
-  const handleChange = (e: any) =>
+  // Fixed handleChange with proper type
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleLogin = async (e: any) => {
+  // Fixed handler types
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.email || !form.password)
       return setMessage("Please fill in all fields.");
@@ -141,7 +156,7 @@ export default function PortalLoginPage() {
         body: JSON.stringify({
           email: form.email,
           password: form.password,
-          schoolSubdomain: school.subdomain,
+          schoolSubdomain: school?.subdomain,
         }),
       });
 
@@ -160,7 +175,7 @@ export default function PortalLoginPage() {
     }
   };
 
-  const handleForgot = async (e: any) => {
+  const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.email) return setMessage("Enter your email to reset password.");
 
@@ -172,7 +187,7 @@ export default function PortalLoginPage() {
         method: "POST",
         body: JSON.stringify({
           email: form.email,
-          schoolSubdomain: school.subdomain,
+          schoolSubdomain: school?.subdomain,
         }),
       });
       setMessage("📧 Password reset instructions sent to your email.");
@@ -183,7 +198,7 @@ export default function PortalLoginPage() {
     }
   };
 
-  const handleRegister = async (e: any) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
@@ -193,7 +208,7 @@ export default function PortalLoginPage() {
         method: "POST",
         body: JSON.stringify({
           ...form,
-          schoolSubdomain: school.subdomain,
+          schoolSubdomain: school?.subdomain,
         }),
       });
 
@@ -257,7 +272,7 @@ export default function PortalLoginPage() {
               
               <p className="text-gray-300 text-sm mb-4">
                 Please enter your school code to continue with registration. 
-                This ensures you're registering for the correct school.
+                This ensures you&apos;re registering for the correct school.
               </p>
 
               <form onSubmit={handleSchoolCodeSubmit} className="space-y-4">
@@ -318,7 +333,6 @@ export default function PortalLoginPage() {
         )}
       </AnimatePresence>
 
-      {/* Rest of your existing code remains the same */}
       {/* 🌫 Floating breadcrumb */}
       <div className="fixed top-5 left-5 z-40">
         <Link
@@ -456,7 +470,7 @@ export default function PortalLoginPage() {
               </button>
               {!isAdmin && (
                 <p className="text-center text-xs mt-3 text-gray-400">
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <span
                     onClick={() => setIsRegister(true)}
                     className="text-blue-400 cursor-pointer hover:underline"

@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Database,
   Languages,
-  Cpu,
 } from "lucide-react";
 import { Scan } from "lucide-react";
 
