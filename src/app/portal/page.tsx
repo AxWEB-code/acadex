@@ -220,32 +220,41 @@ export default function PortalLoginPage() {
   };
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+  e.preventDefault();
+  setLoading(true);
+  setMessage("");
 
-    try {
-      const res = await fetchJSON("/api/students/register", {
-        method: "POST",
-        body: JSON.stringify({
-          ...form,
-          schoolSubdomain: school?.subdomain,
-        }),
-      });
+  try {
+    console.log("📤 [FRONTEND] Sending registration data:", {
+      ...form,
+      schoolSubdomain: school?.subdomain,
+      password: "***" // Don't log actual password
+    });
 
-      if (res.student) {
-        setMessage("✅ Registration successful! You can now log in.");
-        setIsRegister(false);
-        setStep(1);
-      } else {
-        setMessage(res.error || "Registration failed.");
-      }
-    } catch {
-      setMessage("Network error. Please try again.");
-    } finally {
-      setLoading(false);
+    const res = await fetchJSON("/api/students/register", {
+      method: "POST",
+      body: JSON.stringify({
+        ...form,
+        schoolSubdomain: school?.subdomain,
+      }),
+    });
+
+    console.log("📥 [FRONTEND] Registration response:", res);
+
+    if (res.student) {
+      setMessage("✅ Registration successful! You can now log in.");
+      setIsRegister(false);
+      setStep(1);
+    } else {
+      setMessage(res.error || "Registration failed.");
     }
-  };
+  } catch (error) {
+    console.error("❌ [FRONTEND] Registration error:", error);
+    setMessage("Network error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (!school) return null;
 
