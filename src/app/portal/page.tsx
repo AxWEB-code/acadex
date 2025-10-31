@@ -89,19 +89,15 @@ export default function PortalLoginPage() {
 
   const verifySchoolCode = async (code: string): Promise<boolean> => {
   try {
-    const response = await fetch("/api/schools/verify-code", {
+    const response = await fetchJSON("/api/schools/verify-code", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         schoolCode: code,
         schoolId: school?.id,
       }),
     });
     
-    const data = await response.json();
-    return data.isValid === true;
+    return response.isValid === true;
   } catch {
     console.error("Error verifying school code");
     return false;
@@ -109,33 +105,33 @@ export default function PortalLoginPage() {
 };
 
   const handleSchoolCodeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  if (!schoolCode.trim()) {
+    setMessage("Please enter your school code");
+    return;
+  }
+
+  setModalLoading(true);
+  setMessage("");
+
+  try {
+    const isValid = await verifySchoolCode(schoolCode);
     
-    if (!schoolCode.trim()) {
-      setMessage("Please enter your school code");
-      return;
+    if (isValid) {
+      setShowSchoolCodeModal(false);
+      setMessage("");
+      // School code verified, continue with registration
+    } else {
+      setMessage("❌ Invalid school code. Please check with your institution and try again.");
+      // Keep the modal open for retry
     }
-
-    setModalLoading(true);
-    setMessage("");
-
-    try {
-      const isValid = await verifySchoolCode(schoolCode);
-      
-      if (isValid) {
-        setShowSchoolCodeModal(false);
-        setMessage("");
-        // School code verified, continue with registration
-      } else {
-        setMessage("❌ Invalid school code. Please check with your institution and try again.");
-        // Keep the modal open for retry
-      }
-    } catch {
-  setMessage("❌ Verification failed. Please try again.");
-} finally {
-      setModalLoading(false);
-    }
-  };
+  } catch {
+    setMessage("❌ Verification failed. Please try again.");
+  } finally {
+    setModalLoading(false);
+  }
+};
 
   // Fixed handleChange with proper type
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
