@@ -105,8 +105,8 @@ export default function PortalLoginPage() {
 
     console.log("✅ [FRONTEND] Received response:", response);
     return response.isValid === true;
-  } catch (error: any) {
-    console.error("❌ [FRONTEND] Request failed:", error.message);
+  } catch (error) {
+    console.error("❌ [FRONTEND] Request failed:", error instanceof Error ? error.message : String(error));
     return false;
   }
 };
