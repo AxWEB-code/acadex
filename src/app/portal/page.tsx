@@ -126,9 +126,9 @@ export default function PortalLoginPage() {
         setMessage("❌ Invalid school code. Please check with your institution and try again.");
         // Keep the modal open for retry
       }
-    } catch (error) {
-      setMessage("❌ Verification failed. Please try again.");
-    } finally {
+    } catch {
+  setMessage("❌ Verification failed. Please try again.");
+} finally {
       setModalLoading(false);
     }
   };

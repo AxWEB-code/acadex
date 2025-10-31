@@ -55,7 +55,7 @@ export default function TestimonialPopup() {
     return () => typed.destroy();
   }, [index, visible]);
 
-  // Loop messages (don’t run if we must stop on mobile past features)
+  // Loop messages (don't run if we must stop on mobile past features)
   useEffect(() => {
     if (mobileStop) return;
 
@@ -67,7 +67,7 @@ export default function TestimonialPopup() {
       }, delayBetween);
       return () => clearTimeout(t);
     }
-  }, [visible, mobileStop]);
+  }, [visible, mobileStop, randomPosition]); // Added randomPosition to dependencies
 
   // Mobile-only: hide after scrolling past the Features section (smooth fade via AnimatePresence)
   useEffect(() => {

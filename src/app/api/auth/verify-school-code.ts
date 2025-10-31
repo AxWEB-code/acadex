@@ -1,5 +1,6 @@
-// pages/api/auth/verify-school-code.js (or similar)
-export default async function handler(req, res) {
+import { NextApiRequest, NextApiResponse } from 'next';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -7,17 +8,24 @@ export default async function handler(req, res) {
   const { schoolCode, schoolId } = req.body;
 
   try {
-    // Query your database to check if the school code matches
-    const school = await prisma.school.findFirst({
-      where: {
-        id: schoolId,
-        schoolCode: schoolCode, // Your schoolCode column
+    // This is a frontend API route - it should call your backend
+    const backendResponse = await fetch(`${process.env.BACKEND_URL}/api/schools/verify-code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        schoolCode,
+        schoolId,
+      }),
     });
 
-    return res.status(200).json({ 
-      isValid: !!school 
-    });
+    if (!backendResponse.ok) {
+      return res.status(backendResponse.status).json({ isValid: false });
+    }
+
+    const data = await backendResponse.json();
+    return res.status(200).json(data);
 
   } catch (error) {
     console.error('Error verifying school code:', error);
