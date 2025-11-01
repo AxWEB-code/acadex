@@ -30,6 +30,22 @@ interface Department {
   name: string;
 }
 
+function Toast({ message, type }: { message: string; type: "success" | "error" }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-sm font-medium shadow-lg z-50 backdrop-blur-md
+        ${type === "success"
+          ? "bg-green-500/90 text-white"
+          : "bg-red-500/90 text-white"}`}
+    >
+      {message}
+    </motion.div>
+  );
+}
+
 export default function PortalLoginPage() {
   const [school, setSchool] = useState<School | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -61,6 +77,7 @@ export default function PortalLoginPage() {
     academicYear: "",
     contactNumber: "",
   });
+  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("selectedSchool");
@@ -129,7 +146,8 @@ export default function PortalLoginPage() {
   e.preventDefault();
   
   if (!schoolCode.trim()) {
-    setMessage("Please enter your school code");
+    setToast({ msg: "Please enter your school code", type: "error" });
+    setTimeout(() => setToast(null), 3000);
     return;
   }
 
@@ -144,11 +162,13 @@ export default function PortalLoginPage() {
       setMessage("");
       // School code verified, continue with registration
     } else {
-      setMessage("❌ Invalid school code. Please check with your institution and try again.");
+      setToast({ msg: "❌ Invalid school code. Please check with your institution and try again.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
       // Keep the modal open for retry
     }
   } catch {
-    setMessage("❌ Verification failed. Please try again.");
+    setToast({ msg: "❌ Verification failed. Please try again.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
   } finally {
     setModalLoading(false);
   }
@@ -161,16 +181,20 @@ export default function PortalLoginPage() {
   // Fixed handler types
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.password)
-      return setMessage("Please fill in all fields.");
+    if (!form.email || !form.password") {
+      setToast({ msg: "Please fill in all fields.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
 
     setLoading(true);
     setMessage("");
 
     try {
       const endpoint = isAdmin
-        ? "/api/auth/admin/login"
-        : "/api/auth/student/login";
+  ? "/api/auth/admin/login"
+  : "/api/students/login";
+
 
       const res = await fetchJSON(endpoint, {
         method: "POST",
@@ -187,10 +211,12 @@ export default function PortalLoginPage() {
           ? "/portal/admin/dashboard"
           : "/portal/student/dashboard";
       } else {
-        setMessage(res.error || "Invalid credentials.");
+        setToast({ msg: res.error || "Invalid credentials.", type: "error" });
+        setTimeout(() => setToast(null), 3000);
       }
     } catch {
-      setMessage("Network error. Please try again.");
+      setToast({ msg: "Network error. Please try again.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
     } finally {
       setLoading(false);
     }
@@ -198,7 +224,11 @@ export default function PortalLoginPage() {
 
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email) return setMessage("Enter your email to reset password.");
+    if (!form.email) {
+      setToast({ msg: "Enter your email to reset password.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
 
     setLoading(true);
     setMessage("");
@@ -211,9 +241,11 @@ export default function PortalLoginPage() {
           schoolSubdomain: school?.subdomain,
         }),
       });
-      setMessage("📧 Password reset instructions sent to your email.");
+      setToast({ msg: "📧 Password reset instructions sent to your email.", type: "success" });
+      setTimeout(() => setToast(null), 3000);
     } catch {
-      setMessage("Failed to send reset link.");
+      setToast({ msg: "Failed to send reset link.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
     } finally {
       setLoading(false);
     }
@@ -224,17 +256,20 @@ export default function PortalLoginPage() {
 
   // ✅ Validate all critical fields before sending
   if (!form.firstName || !form.lastName) {
-    setMessage("Please fill in your first and last name.");
+    setToast({ msg: "Please fill in your first and last name.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
     return;
   }
 
   if (!form.email || !form.password) {
-    setMessage("Please enter your email and password.");
+    setToast({ msg: "Please enter your email and password.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
     return;
   }
 
   if (!school?.subdomain) {
-    setMessage("School information is missing. Please reselect your school.");
+    setToast({ msg: "School information is missing. Please reselect your school.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
     return;
   }
 
@@ -260,15 +295,18 @@ export default function PortalLoginPage() {
     console.log("📥 [FRONTEND] Registration response:", res);
 
     if (res.student) {
-      setMessage("✅ Registration successful! You can now log in.");
+      setToast({ msg: "✅ Registration successful! You can now log in.", type: "success" });
+      setTimeout(() => setToast(null), 3000);
       setIsRegister(false);
       setStep(1);
     } else {
-      setMessage(res.error || "Registration failed.");
+      setToast({ msg: res.error || "Registration failed.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
     }
   } catch (error) {
     console.error("❌ [FRONTEND] Registration error:", error);
-    setMessage("Network error. Please try again.");
+    setToast({ msg: "Network error. Please try again.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
   } finally {
     setLoading(false);
   }
@@ -286,6 +324,13 @@ export default function PortalLoginPage() {
     <div
       className={`min-h-screen flex flex-col items-center justify-center bg-gradient-to-b ${bgColors} text-white px-6 py-10 overflow-hidden relative`}
     >
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <Toast message={toast.msg} type={toast.type} />
+        )}
+      </AnimatePresence>
+
       {/* School Code Modal */}
       <AnimatePresence>
         {showSchoolCodeModal && (
@@ -514,9 +559,6 @@ export default function PortalLoginPage() {
                 </span>
               </div>
 
-              {message && (
-                <p className="text-center text-sm text-red-400">{message}</p>
-              )}
               <button
                 type="submit"
                 disabled={loading}
@@ -561,9 +603,6 @@ export default function PortalLoginPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500"
               />
-              {message && (
-                <p className="text-center text-sm text-red-400">{message}</p>
-              )}
               <button
                 type="submit"
                 disabled={loading}
@@ -786,10 +825,6 @@ export default function PortalLoginPage() {
                       </button>
                     </div>
                   </>
-                )}
-
-                {message && (
-                  <p className="text-center text-sm text-red-400">{message}</p>
                 )}
 
                 <button
