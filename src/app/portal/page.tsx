@@ -231,7 +231,7 @@ export default function PortalLoginPage() {
       password: "***" // Don't log actual password
     });
 
-    const res = await fetchJSON("/api/students/register", {
+   const res = await fetchJSON("/api/students/register", {
       method: "POST",
       body: JSON.stringify({
         ...form,
