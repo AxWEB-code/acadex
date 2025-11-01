@@ -36,7 +36,7 @@ function Toast({ message, type }: { message: string; type: "success" | "error" }
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-sm font-medium shadow-lg z-50 backdrop-blur-md
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-sm font-medium shadow-lg z-[9999] backdrop-blur-md
         ${type === "success"
           ? "bg-green-500/90 text-white"
           : "bg-red-500/90 text-white"}`}
@@ -295,10 +295,15 @@ export default function PortalLoginPage() {
     console.log("📥 [FRONTEND] Registration response:", res);
 
     if (res.student) {
-      setToast({ msg: "✅ Registration successful! You can now log in.", type: "success" });
-      setTimeout(() => setToast(null), 3000);
-      setIsRegister(false);
-      setStep(1);
+  setToast({
+    msg: "✅ Registration successful! Your account is pending approval by the school admin. You’ll receive an email notification once it’s approved.",
+    type: "success",
+  });
+  setTimeout(() => setToast(null), 4000);
+  setIsRegister(false);
+  setStep(1);
+
+
     } else {
       setToast({ msg: res.error || "Registration failed.", type: "error" });
       setTimeout(() => setToast(null), 3000);
