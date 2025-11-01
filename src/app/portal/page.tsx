@@ -221,8 +221,26 @@ export default function PortalLoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
   e.preventDefault();
+
+  // ✅ Validate all critical fields before sending
+  if (!form.firstName || !form.lastName) {
+    setMessage("Please fill in your first and last name.");
+    return;
+  }
+
+  if (!form.email || !form.password) {
+    setMessage("Please enter your email and password.");
+    return;
+  }
+
+  if (!school?.subdomain) {
+    setMessage("School information is missing. Please reselect your school.");
+    return;
+  }
+
   setLoading(true);
   setMessage("");
+
 
   try {
     console.log("📤 [FRONTEND] Sending registration data:", {
