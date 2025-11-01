@@ -372,7 +372,7 @@ export default function PortalLoginPage() {
                 <div>
                   <input
                     type="text"
-                    placeholder="SCH-ECNS-9466"
+                    placeholder="SCH-****-****"
                     value={schoolCode}
                     onChange={(e) => setSchoolCode(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400"
