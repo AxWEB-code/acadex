@@ -432,7 +432,7 @@ export default function PortalLoginPage() {
           href="/select-school"
           className="flex items-center gap-2 bg-white/10 backdrop-blur-lg border border-white/10 px-3 py-2 rounded-full text-gray-300 hover:text-blue-400 text-sm shadow-md transition"
         >
-          <ArrowLeft size={16} /> Back to School Selection
+          <ArrowLeft size={16} /> Back to School
         </Link>
       </div>
 
