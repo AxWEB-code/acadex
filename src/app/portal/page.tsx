@@ -181,7 +181,7 @@ export default function PortalLoginPage() {
   // Fixed handler types
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.password") {
+    if (!form.email || !form.password) {
       setToast({ msg: "Please fill in all fields.", type: "error" });
       setTimeout(() => setToast(null), 3000);
       return;
