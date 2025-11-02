@@ -1,4 +1,3 @@
-// src/lib/config.ts
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "http://localhost:4000"; // ✅ fallback for local testing
+  "https://acadex-backend-qrds.onrender.com";
