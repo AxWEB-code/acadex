@@ -330,17 +330,21 @@ export default function PortalLoginPage() {
         password: "***" // Don't log actual password
       });
 
-      const res = await fetch(`${API_BASE}/api/students/register`, {
-        method: "POST",
-        body: JSON.stringify({
-          ...form,
-          schoolSubdomain: school?.subdomain,
-        }),
-      });
+      const response = await fetch(`${API_BASE}/api/students/register`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...form,
+    schoolSubdomain: school?.subdomain,
+  }),
+});
 
-      console.log("📥 [FRONTEND] Registration response:", res);
+const res = await response.json(); // ✅ Parse to JSON first
 
-      if (res.student) {
+console.log("📥 [FRONTEND] Registration response:", res);
+
+if (res.student) {
+
         // ✅ FIXED: Show approval pending message
         setToast({
           msg: "✅ Registration successful! Your account is pending approval by the school admin. You'll receive an email notification once it's approved.",
