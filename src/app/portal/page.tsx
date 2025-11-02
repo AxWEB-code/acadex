@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { fetchJSON } from "@/lib/api";
+import { API_BASE } from "@/lib/config";
+
 
 // Define proper types to replace 'any'
 interface School {
@@ -201,8 +203,9 @@ export default function PortalLoginPage() {
 
     try {
       const endpoint = isAdmin
-        ? "/api/auth/admin/login"
-        : "/api/students/login";
+  ? `${API_BASE}/api/auth/admin/login`
+  : `${API_BASE}/api/students/login`;
+
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -278,7 +281,7 @@ export default function PortalLoginPage() {
     setMessage("");
 
     try {
-      await fetchJSON("/api/auth/forgot-password", {
+      await fetch(`${API_BASE}/api/auth/forgot-password`, {
         method: "POST",
         body: JSON.stringify({
           email: form.email,
@@ -327,7 +330,7 @@ export default function PortalLoginPage() {
         password: "***" // Don't log actual password
       });
 
-      const res = await fetchJSON("/api/students/register", {
+      const res = await fetch(`${API_BASE}/api/students/register`, {
         method: "POST",
         body: JSON.stringify({
           ...form,
