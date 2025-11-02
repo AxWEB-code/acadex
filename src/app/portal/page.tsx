@@ -193,57 +193,70 @@ export default function PortalLoginPage() {
     setMessage("");
 
     try {
-      const endpoint = isAdmin
-        ? "/api/auth/admin/login"
-        : "/api/students/login";
+  const endpoint = isAdmin
+    ? "/api/auth/admin/login"
+    : "/api/students/login";
 
-      // ✅ FIXED: Use fetchJSON for consistency
-      const res = await fetchJSON(endpoint, {
-        method: "POST",
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-          schoolSubdomain: school?.subdomain,
-        }),
-      });
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: form.email,
+      password: form.password,
+      schoolSubdomain: school?.subdomain,
+    }),
+  });
 
-      if (res.token) {
-        setToast({
-          msg: "✅ Login successful! Redirecting...",
-          type: "success",
-        });
-        setTimeout(() => {
-          localStorage.setItem("acadexUser", JSON.stringify(res));
-          window.location.href = isAdmin
-            ? "/portal/admin/dashboard"
-            : "/portal/student/dashboard";
-        }, 1500);
-      } else {
-        // 🌀 Trigger shake animation when login fails
-        setShake(true);
-        setToast({
-          msg: res.error || "❌ Invalid credentials.",
-          type: "error",
-        });
-        setTimeout(() => {
-          setShake(false);
-          setToast(null);
-        }, 3500);
-      }
-    } catch (error) {
-      setShake(true);
-      setToast({
-        msg: "⚠️ Unable to reach server. Please check your connection.",
-        type: "error",
-      });
-      setTimeout(() => {
-        setShake(false);
-        setToast(null);
-      }, 3500);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ✅ Read JSON safely (even for 401/403)
+  let data: any = {};
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+
+  if (response.ok && data.token) {
+    setToast({
+      msg: "✅ Login successful! Redirecting...",
+      type: "success",
+    });
+    setTimeout(() => {
+      localStorage.setItem("acadexUser", JSON.stringify(data));
+      window.location.href = isAdmin
+        ? "/portal/admin/dashboard"
+        : "/portal/student/dashboard";
+    }, 1500);
+  } else {
+    // ✅ Properly show backend error message instead of “network error”
+    setShake(true);
+    setToast({
+      msg:
+        data.error ||
+        (response.status === 401
+          ? "❌ Incorrect email or password."
+          : "⚠️ Login failed. Please try again."),
+      type: "error",
+    });
+    setTimeout(() => {
+      setShake(false);
+      setToast(null);
+    }, 3500);
+  }
+} catch (error) {
+  // Only runs if backend cannot be reached at all
+  setShake(true);
+  setToast({
+    msg: "🚫 Server unreachable. Check your internet or try again later.",
+    type: "error",
+  });
+  setTimeout(() => {
+    setShake(false);
+    setToast(null);
+  }, 3500);
+} finally {
+  setLoading(false);
+}
+
 
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
