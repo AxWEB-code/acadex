@@ -62,7 +62,6 @@ export default function PortalLoginPage() {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [shake, setShake] = useState(false);
 
-
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -80,6 +79,10 @@ export default function PortalLoginPage() {
     contactNumber: "",
   });
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+
+  // ✅ ADDED MISSING FUNCTION
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   useEffect(() => {
     const stored = localStorage.getItem("selectedSchool");
@@ -111,140 +114,136 @@ export default function PortalLoginPage() {
   };
 
   const verifySchoolCode = async (code: string): Promise<boolean> => {
-  try {
-    console.log("🔍 [FRONTEND DEBUG] Starting verification...", {
-      enteredCode: code,
-      schoolId: school?.id,
-      schoolName: school?.name,
-      schoolSubdomain: school?.subdomain
-    });
-
-    const response = await fetchJSON("/api/schools/verify-code", {
-      method: "POST",
-      body: JSON.stringify({
-        schoolCode: code.trim().toUpperCase(),
+    try {
+      console.log("🔍 [FRONTEND DEBUG] Starting verification...", {
+        enteredCode: code,
         schoolId: school?.id,
-      }),
-    });
+        schoolName: school?.name,
+        schoolSubdomain: school?.subdomain
+      });
 
-    console.log("🔍 [FRONTEND DEBUG] Full API response:", response);
-    
-    if (response.isValid === true) {
-      console.log("✅ [FRONTEND DEBUG] Code is VALID!");
-      return true;
-    } else {
-      console.log("❌ [FRONTEND DEBUG] Code is INVALID according to backend");
-      console.log("🔍 [FRONTEND DEBUG] Response details:", response);
+      const response = await fetchJSON("/api/schools/verify-code", {
+        method: "POST",
+        body: JSON.stringify({
+          schoolCode: code.trim().toUpperCase(),
+          schoolId: school?.id,
+        }),
+      });
+
+      console.log("🔍 [FRONTEND DEBUG] Full API response:", response);
+      
+      if (response.isValid === true) {
+        console.log("✅ [FRONTEND DEBUG] Code is VALID!");
+        return true;
+      } else {
+        console.log("❌ [FRONTEND DEBUG] Code is INVALID according to backend");
+        console.log("🔍 [FRONTEND DEBUG] Response details:", response);
+        return false;
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("❌ [FRONTEND DEBUG] Request failed:", errorMessage);
       return false;
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("❌ [FRONTEND DEBUG] Request failed:", errorMessage);
-    return false;
-  }
-};
+  };
 
   const handleSchoolCodeSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (!schoolCode.trim()) {
-    setToast({ msg: "Please enter your school code", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
-
-  setModalLoading(true);
-  setMessage("");
-
-  try {
-    const isValid = await verifySchoolCode(schoolCode);
+    e.preventDefault();
     
-    if (isValid) {
-      setShowSchoolCodeModal(false);
-      setMessage("");
-      // School code verified, continue with registration
-    } else {
-      setToast({ msg: "❌ Invalid school code. Please check with your institution and try again.", type: "error" });
+    if (!schoolCode.trim()) {
+      setToast({ msg: "Please enter your school code", type: "error" });
       setTimeout(() => setToast(null), 3000);
-      // Keep the modal open for retry
+      return;
     }
-  } catch {
-    setToast({ msg: "❌ Verification failed. Please try again.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-  } finally {
-    setModalLoading(false);
-  }
-};
+
+    setModalLoading(true);
+    setMessage("");
+
+    try {
+      const isValid = await verifySchoolCode(schoolCode);
+      
+      if (isValid) {
+        setShowSchoolCodeModal(false);
+        setMessage("");
+        // School code verified, continue with registration
+      } else {
+        setToast({ msg: "❌ Invalid school code. Please check with your institution and try again.", type: "error" });
+        setTimeout(() => setToast(null), 3000);
+        // Keep the modal open for retry
+      }
+    } catch {
+      setToast({ msg: "❌ Verification failed. Please try again.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   // ✅ FIXED handleLogin with shake animation
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!form.email || !form.password) {
-    setToast({ msg: "Please fill in all fields.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
+    if (!form.email || !form.password) {
+      setToast({ msg: "Please fill in all fields.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
 
-  setLoading(true);
-  setMessage("");
+    setLoading(true);
+    setMessage("");
 
-  try {
-    const endpoint = isAdmin
-      ? "/api/auth/admin/login"
-      : "/api/students/login";
+    try {
+      const endpoint = isAdmin
+        ? "/api/auth/admin/login"
+        : "/api/students/login";
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: form.email,
-        password: form.password,
-        schoolSubdomain: school?.subdomain,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.token) {
-      setToast({
-        msg: "✅ Login successful! Redirecting...",
-        type: "success",
+      // ✅ FIXED: Use fetchJSON for consistency
+      const res = await fetchJSON(endpoint, {
+        method: "POST",
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          schoolSubdomain: school?.subdomain,
+        }),
       });
-      setTimeout(() => {
-        localStorage.setItem("acadexUser", JSON.stringify(data));
-        window.location.href = isAdmin
-          ? "/portal/admin/dashboard"
-          : "/portal/student/dashboard";
-      }, 1500);
-    } else {
-      // 🌀 Trigger shake animation when login fails
+
+      if (res.token) {
+        setToast({
+          msg: "✅ Login successful! Redirecting...",
+          type: "success",
+        });
+        setTimeout(() => {
+          localStorage.setItem("acadexUser", JSON.stringify(res));
+          window.location.href = isAdmin
+            ? "/portal/admin/dashboard"
+            : "/portal/student/dashboard";
+        }, 1500);
+      } else {
+        // 🌀 Trigger shake animation when login fails
+        setShake(true);
+        setToast({
+          msg: res.error || "❌ Invalid credentials.",
+          type: "error",
+        });
+        setTimeout(() => {
+          setShake(false);
+          setToast(null);
+        }, 3500);
+      }
+    } catch (error) {
       setShake(true);
       setToast({
-        msg: data.error || "❌ Invalid credentials.",
+        msg: "⚠️ Unable to reach server. Please check your connection.",
         type: "error",
       });
       setTimeout(() => {
         setShake(false);
         setToast(null);
       }, 3500);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setShake(true);
-    setToast({
-      msg: "⚠️ Unable to reach server. Please check your connection.",
-      type: "error",
-    });
-    setTimeout(() => {
-      setShake(false);
-      setToast(null);
-    }, 3500);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,70 +275,93 @@ const handleLogin = async (e: React.FormEvent) => {
   };
 
   const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // ✅ Validate all critical fields before sending
-  if (!form.firstName || !form.lastName) {
-    setToast({ msg: "Please fill in your first and last name.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
+    // ✅ Validate all critical fields before sending
+    if (!form.firstName || !form.lastName) {
+      setToast({ msg: "Please fill in your first and last name.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
 
-  if (!form.email || !form.password) {
-    setToast({ msg: "Please enter your email and password.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
+    if (!form.email || !form.password) {
+      setToast({ msg: "Please enter your email and password.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
 
-  if (!school?.subdomain) {
-    setToast({ msg: "School information is missing. Please reselect your school.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
+    if (!school?.subdomain) {
+      setToast({ msg: "School information is missing. Please reselect your school.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
 
-  setLoading(true);
-  setMessage("");
+    setLoading(true);
+    setMessage("");
 
-
-  try {
-    console.log("📤 [FRONTEND] Sending registration data:", {
-      ...form,
-      schoolSubdomain: school?.subdomain,
-      password: "***" // Don't log actual password
-    });
-
-   const res = await fetchJSON("/api/students/register", {
-      method: "POST",
-      body: JSON.stringify({
+    try {
+      console.log("📤 [FRONTEND] Sending registration data:", {
         ...form,
         schoolSubdomain: school?.subdomain,
-      }),
-    });
+        password: "***" // Don't log actual password
+      });
 
-    console.log("📥 [FRONTEND] Registration response:", res);
+      const res = await fetchJSON("/api/students/register", {
+        method: "POST",
+        body: JSON.stringify({
+          ...form,
+          schoolSubdomain: school?.subdomain,
+        }),
+      });
 
-    if (res.student) {
-  setToast({
-    msg: "✅ Registration successful! Your account is pending approval by the school admin. You’ll receive an email notification once it’s approved.",
-    type: "success",
-  });
-  setTimeout(() => setToast(null), 4000);
-  setIsRegister(false);
-  setStep(1);
+      console.log("📥 [FRONTEND] Registration response:", res);
 
-
-    } else {
-      setToast({ msg: res.error || "Registration failed.", type: "error" });
+      if (res.student) {
+        // ✅ FIXED: Show approval pending message
+        setToast({
+          msg: "✅ Registration successful! Your account is pending approval by the school admin. You'll receive an email notification once it's approved.",
+          type: "success",
+        });
+        setTimeout(() => setToast(null), 4000);
+        
+        // ✅ FIXED: Reset form properly
+        setForm({
+          firstName: "",
+          lastName: "",
+          email: "",
+          gender: "",
+          password: "",
+          dob: "",
+          admissionNo: "",
+          department: "",
+          level: "",
+          class: "",
+          semester: "",
+          term: "",
+          academicYear: "",
+          contactNumber: "",
+        });
+        setIsRegister(false);
+        setStep(1);
+      } else {
+        // ✅ FIXED: Better error handling for duplicates
+        if (res.error?.includes("email") || res.error?.includes("Email")) {
+          setToast({ msg: "❌ This email is already registered. Please use a different email or try logging in.", type: "error" });
+        } else if (res.error?.includes("admission") || res.error?.includes("Admission")) {
+          setToast({ msg: "❌ This admission number is already registered. Please check your admission number or contact your school.", type: "error" });
+        } else {
+          setToast({ msg: res.error || "Registration failed.", type: "error" });
+        }
+        setTimeout(() => setToast(null), 3000);
+      }
+    } catch (error) {
+      console.error("❌ [FRONTEND] Registration error:", error);
+      setToast({ msg: "Network error. Please try again.", type: "error" });
       setTimeout(() => setToast(null), 3000);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("❌ [FRONTEND] Registration error:", error);
-    setToast({ msg: "Network error. Please try again.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   if (!school) return null;
 
@@ -360,7 +382,7 @@ const handleLogin = async (e: React.FormEvent) => {
         )}
       </AnimatePresence>
 
-      {/* School Code Modal */}
+      {/* School Code Modal - FIXED: Better error display */}
       <AnimatePresence>
         {showSchoolCodeModal && (
           <motion.div
@@ -368,12 +390,19 @@ const handleLogin = async (e: React.FormEvent) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => {
+              setShowSchoolCodeModal(false);
+              setIsRegister(false);
+              setSchoolCode("");
+              setMessage("");
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-[#181b2c] border border-white/10 rounded-2xl p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-blue-400">
@@ -403,24 +432,32 @@ const handleLogin = async (e: React.FormEvent) => {
                     type="text"
                     placeholder="SCH-****-****"
                     value={schoolCode}
-                    onChange={(e) => setSchoolCode(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400"
+                    onChange={(e) => setSchoolCode(e.target.value.toUpperCase())}
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400 text-center font-mono tracking-wider"
                     disabled={modalLoading}
+                    autoFocus
                   />
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-gray-400 mt-2 text-center">
                     Your school code should be provided by your institution
                   </p>
                 </div>
 
+                {/* ✅ FIXED: Better error message positioning */}
                 {message && (
-                  <p className={`text-center text-sm ${
-                    message.includes("❌") ? "text-red-400" : "text-green-400"
-                  }`}>
+                  <motion.p 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className={`text-center text-sm p-3 rounded-lg ${
+                      message.includes("❌") 
+                        ? "bg-red-500/20 text-red-300 border border-red-500/30" 
+                        : "bg-green-500/20 text-green-300 border border-green-500/30"
+                    }`}
+                  >
                     {message}
-                  </p>
+                  </motion.p>
                 )}
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -546,19 +583,18 @@ const handleLogin = async (e: React.FormEvent) => {
           {/* LOGIN */}
           {!isRegister && !isForgot && (
             <motion.form
-  key="login"
-  onSubmit={handleLogin}
-  initial={{ opacity: 0, y: 10 }}
-  animate={{
-    opacity: 1,
-    y: 0,
-    x: shake ? [0, -10, 10, -10, 10, 0] : 0,
-  }}
-  exit={{ opacity: 0, y: -10 }}
-  transition={{ duration: 0.4 }}
-  className="space-y-4"
->
-
+              key="login"
+              onSubmit={handleLogin}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                x: shake ? [0, -10, 10, -10, 10, 0] : 0,
+              }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-4"
+            >
               <input
                 type="email"
                 name="email"
@@ -864,9 +900,19 @@ const handleLogin = async (e: React.FormEvent) => {
                 <button
                   type={step < 3 ? "button" : "submit"}
                   onClick={() => step < 3 && setStep(step + 1)}
-                  className={`w-full mt-2 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition-all`}
+                  disabled={loading}
+                  className={`w-full mt-2 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition-all disabled:opacity-50`}
                 >
-                  {step < 3 ? "Next →" : "Register"}
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Creating Account...
+                    </div>
+                  ) : step < 3 ? (
+                    "Next →"
+                  ) : (
+                    "Create Account"
+                  )}
                 </button>
 
                 {step === 3 && (
