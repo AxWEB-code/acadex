@@ -191,53 +191,52 @@ export default function PortalLoginPage() {
     setMessage("");
 
     try {
-      const endpoint = isAdmin
-  ? "/api/auth/admin/login"
-  : "/api/students/login";
+  const endpoint = isAdmin
+    ? "/api/auth/admin/login"
+    : "/api/students/login";
 
-
-      const res = await fetchJSON(endpoint, {
-        method: "POST",
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-          schoolSubdomain: school?.subdomain,
-        }),
-      });
-
-      if (res.token) {
-  setToast({
-    msg: "✅ Login successful! Redirecting...",
-    type: "success",
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: form.email,
+      password: form.password,
+      schoolSubdomain: school?.subdomain,
+    }),
   });
-  setTimeout(() => {
-    localStorage.setItem("acadexUser", JSON.stringify(res));
-    window.location.href = isAdmin
-      ? "/portal/admin/dashboard"
-      : "/portal/student/dashboard";
-  }, 1000);
-} else if (res.error) {
+
+  const data = await response.json();
+
+  // Handle known backend responses
+  if (response.ok && data.token) {
+    setToast({
+      msg: "✅ Login successful! Redirecting...",
+      type: "success",
+    });
+    setTimeout(() => {
+      localStorage.setItem("acadexUser", JSON.stringify(data));
+      window.location.href = isAdmin
+        ? "/portal/admin/dashboard"
+        : "/portal/student/dashboard";
+    }, 1500);
+  } else {
+    // Show proper backend error or fallback message
+    setToast({
+      msg: data.error || "❌ Invalid credentials.",
+      type: "error",
+    });
+    setTimeout(() => setToast(null), 3500);
+  }
+} catch (error) {
   setToast({
-    msg: res.error,
+    msg: "⚠️ Unable to reach server. Please check your connection.",
     type: "error",
   });
-  setTimeout(() => setToast(null), 4000);
-} else {
-  setToast({
-    msg: "❌ Unexpected error. Please try again.",
-    type: "error",
-  });
-  setTimeout(() => setToast(null), 4000);
+  setTimeout(() => setToast(null), 3500);
+} finally {
+  setLoading(false);
 }
 
-      
-    } catch {
-      setToast({ msg: "Network error. Please try again.", type: "error" });
-      setTimeout(() => setToast(null), 3000);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
