@@ -60,6 +60,8 @@ export default function PortalLoginPage() {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [shake, setShake] = useState(false);
+
 
   const [form, setForm] = useState({
     firstName: "",
@@ -174,68 +176,74 @@ export default function PortalLoginPage() {
   }
 };
 
-  // Fixed handleChange with proper type
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // ✅ FIXED handleLogin with shake animation
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  // Fixed handler types
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.email || !form.password) {
-      setToast({ msg: "Please fill in all fields.", type: "error" });
-      setTimeout(() => setToast(null), 3000);
-      return;
-    }
+  if (!form.email || !form.password) {
+    setToast({ msg: "Please fill in all fields.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
+    return;
+  }
 
-    setLoading(true);
-    setMessage("");
+  setLoading(true);
+  setMessage("");
 
-    try {
-  const endpoint = isAdmin
-    ? "/api/auth/admin/login"
-    : "/api/students/login";
+  try {
+    const endpoint = isAdmin
+      ? "/api/auth/admin/login"
+      : "/api/students/login";
 
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: form.email,
-      password: form.password,
-      schoolSubdomain: school?.subdomain,
-    }),
-  });
-
-  const data = await response.json();
-
-  // Handle known backend responses
-  if (response.ok && data.token) {
-    setToast({
-      msg: "✅ Login successful! Redirecting...",
-      type: "success",
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: form.email,
+        password: form.password,
+        schoolSubdomain: school?.subdomain,
+      }),
     });
-    setTimeout(() => {
-      localStorage.setItem("acadexUser", JSON.stringify(data));
-      window.location.href = isAdmin
-        ? "/portal/admin/dashboard"
-        : "/portal/student/dashboard";
-    }, 1500);
-  } else {
-    // Show proper backend error or fallback message
+
+    const data = await response.json();
+
+    if (response.ok && data.token) {
+      setToast({
+        msg: "✅ Login successful! Redirecting...",
+        type: "success",
+      });
+      setTimeout(() => {
+        localStorage.setItem("acadexUser", JSON.stringify(data));
+        window.location.href = isAdmin
+          ? "/portal/admin/dashboard"
+          : "/portal/student/dashboard";
+      }, 1500);
+    } else {
+      // 🌀 Trigger shake animation when login fails
+      setShake(true);
+      setToast({
+        msg: data.error || "❌ Invalid credentials.",
+        type: "error",
+      });
+      setTimeout(() => {
+        setShake(false);
+        setToast(null);
+      }, 3500);
+    }
+  } catch (error) {
+    setShake(true);
     setToast({
-      msg: data.error || "❌ Invalid credentials.",
+      msg: "⚠️ Unable to reach server. Please check your connection.",
       type: "error",
     });
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => {
+      setShake(false);
+      setToast(null);
+    }, 3500);
+  } finally {
+    setLoading(false);
   }
-} catch (error) {
-  setToast({
-    msg: "⚠️ Unable to reach server. Please check your connection.",
-    type: "error",
-  });
-  setTimeout(() => setToast(null), 3500);
-} finally {
-  setLoading(false);
-}
+};
+
 
 
   const handleForgot = async (e: React.FormEvent) => {
@@ -538,14 +546,19 @@ export default function PortalLoginPage() {
           {/* LOGIN */}
           {!isRegister && !isForgot && (
             <motion.form
-              key="login"
-              onSubmit={handleLogin}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
+  key="login"
+  onSubmit={handleLogin}
+  initial={{ opacity: 0, y: 10 }}
+  animate={{
+    opacity: 1,
+    y: 0,
+    x: shake ? [0, -10, 10, -10, 10, 0] : 0,
+  }}
+  exit={{ opacity: 0, y: -10 }}
+  transition={{ duration: 0.4 }}
+  className="space-y-4"
+>
+
               <input
                 type="email"
                 name="email"
