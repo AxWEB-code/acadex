@@ -206,14 +206,31 @@ export default function PortalLoginPage() {
       });
 
       if (res.token) {
-        localStorage.setItem("acadexUser", JSON.stringify(res));
-        window.location.href = isAdmin
-          ? "/portal/admin/dashboard"
-          : "/portal/student/dashboard";
-      } else {
-        setToast({ msg: res.error || "Invalid credentials.", type: "error" });
-        setTimeout(() => setToast(null), 3000);
-      }
+  setToast({
+    msg: "✅ Login successful! Redirecting...",
+    type: "success",
+  });
+  setTimeout(() => {
+    localStorage.setItem("acadexUser", JSON.stringify(res));
+    window.location.href = isAdmin
+      ? "/portal/admin/dashboard"
+      : "/portal/student/dashboard";
+  }, 1000);
+} else if (res.error) {
+  setToast({
+    msg: res.error,
+    type: "error",
+  });
+  setTimeout(() => setToast(null), 4000);
+} else {
+  setToast({
+    msg: "❌ Unexpected error. Please try again.",
+    type: "error",
+  });
+  setTimeout(() => setToast(null), 4000);
+}
+
+      
     } catch {
       setToast({ msg: "Network error. Please try again.", type: "error" });
       setTimeout(() => setToast(null), 3000);
