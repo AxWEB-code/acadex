@@ -30,6 +30,13 @@ interface Department {
   name: string;
 }
 
+// ✅ ADDED: Proper type for login response
+interface LoginResponse {
+  token?: string;
+  error?: string;
+  [key: string]: unknown;
+}
+
 function Toast({ message, type }: { message: string; type: "success" | "error" }) {
   return (
     <motion.div
@@ -179,85 +186,85 @@ export default function PortalLoginPage() {
     }
   };
 
-  // ✅ FIXED handleLogin with shake animation
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
+  // ✅ FIXED handleLogin with proper typing
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!form.email || !form.password) {
-    setToast({ msg: "Please fill in all fields.", type: "error" });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
-
-  setLoading(true);
-  setMessage("");
-
-  try {
-    const endpoint = isAdmin
-      ? "/api/auth/admin/login"
-      : "/api/students/login";
-
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: form.email,
-        password: form.password,
-        schoolSubdomain: school?.subdomain,
-      }),
-    });
-
-    // ✅ Read JSON safely (even for 401/403)
-    let data: any = {};
-    try {
-      data = await response.json();
-    } catch {
-      data = {};
+    if (!form.email || !form.password) {
+      setToast({ msg: "Please fill in all fields.", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+      return;
     }
 
-    if (response.ok && data.token) {
-      setToast({
-        msg: "✅ Login successful! Redirecting...",
-        type: "success",
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const endpoint = isAdmin
+        ? "/api/auth/admin/login"
+        : "/api/students/login";
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          schoolSubdomain: school?.subdomain,
+        }),
       });
-      setTimeout(() => {
-        localStorage.setItem("acadexUser", JSON.stringify(data));
-        window.location.href = isAdmin
-          ? "/portal/admin/dashboard"
-          : "/portal/student/dashboard";
-      }, 1500);
-    } else {
-      // ✅ Properly show backend error message instead of "network error"
+
+      // ✅ FIXED: Proper typing instead of 'any'
+      let data: LoginResponse = {};
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
+
+      if (response.ok && data.token) {
+        setToast({
+          msg: "✅ Login successful! Redirecting...",
+          type: "success",
+        });
+        setTimeout(() => {
+          localStorage.setItem("acadexUser", JSON.stringify(data));
+          window.location.href = isAdmin
+            ? "/portal/admin/dashboard"
+            : "/portal/student/dashboard";
+        }, 1500);
+      } else {
+        // ✅ Properly show backend error message instead of "network error"
+        setShake(true);
+        setToast({
+          msg:
+            data.error ||
+            (response.status === 401
+              ? "❌ Incorrect email or password."
+              : "⚠️ Login failed. Please try again."),
+          type: "error",
+        });
+        setTimeout(() => {
+          setShake(false);
+          setToast(null);
+        }, 3500);
+      }
+    } catch {
+      // ✅ FIXED: Removed unused 'error' parameter
+      // Only runs if backend cannot be reached at all
       setShake(true);
       setToast({
-        msg:
-          data.error ||
-          (response.status === 401
-            ? "❌ Incorrect email or password."
-            : "⚠️ Login failed. Please try again."),
+        msg: "🚫 Server unreachable. Check your internet or try again later.",
         type: "error",
       });
       setTimeout(() => {
         setShake(false);
         setToast(null);
       }, 3500);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    // Only runs if backend cannot be reached at all
-    setShake(true);
-    setToast({
-      msg: "🚫 Server unreachable. Check your internet or try again later.",
-      type: "error",
-    });
-    setTimeout(() => {
-      setShake(false);
-      setToast(null);
-    }, 3500);
-  } finally {
-    setLoading(false);
-  }
-}; // ✅ ADDED THIS MISSING CLOSING BRACE
-
+  };
 
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
