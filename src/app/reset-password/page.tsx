@@ -34,11 +34,12 @@ function ResetPasswordContent() {
     setMessage("");
 
     try {
-      const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, newPassword: password }),
-      });
+      const res = await fetch(`${API_BASE}/api/approvals/auth/reset-password`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ token, newPassword: password }),
+});
+
 
       const data = await res.json();
 
