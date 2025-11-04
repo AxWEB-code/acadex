@@ -64,13 +64,20 @@ function ResetPasswordContent() {
 
   // 🔁 Redirect automatically after success
   useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => {
-        router.push("/portal/login");
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success, router]);
+  if (success) {
+    const timer = setTimeout(() => {
+      const savedSchool = localStorage.getItem("selectedSchool");
+      if (savedSchool) {
+        const school = JSON.parse(savedSchool);
+        router.push(`/portal/${school.subdomain}/login`);
+      } else {
+        router.push("/select-school");
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }
+}, [success, router]);
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6">
