@@ -68,8 +68,7 @@ function ResetPasswordContent() {
     const timer = setTimeout(() => {
       const savedSchool = localStorage.getItem("selectedSchool");
       if (savedSchool) {
-        const school = JSON.parse(savedSchool);
-        router.push(`/portal/${school.subdomain}/login`);
+        router.push("/portal");
       } else {
         router.push("/select-school");
       }
@@ -77,6 +76,7 @@ function ResetPasswordContent() {
     return () => clearTimeout(timer);
   }
 }, [success, router]);
+
 
 
   return (
