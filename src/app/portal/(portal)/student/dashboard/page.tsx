@@ -11,6 +11,7 @@ import {
   UserRound,
   Settings,
   Medal,
+  LogOut,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,7 +34,6 @@ export default function StudentDashboardPage() {
 
   useEffect(() => {
     (async () => {
-      // TODO: replace this mock with real API call later
       const mock: MiniStats = {
         name: "John Doe",
         rollNumber: "ECNS2025-015",
@@ -45,7 +45,7 @@ export default function StudentDashboardPage() {
         unreadNotifications: 3,
         school: {
           name: "Ezeala College",
-          logo: "/acadex-logo.png",
+          logo: "/acadex-logo.png", // TODO: dynamic from backend
         },
       };
       setStats(mock);
@@ -64,72 +64,90 @@ export default function StudentDashboardPage() {
 
   return (
     <div className="space-y-8 relative">
-      {/* Glow background accents */}
+      {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-16 -left-10 h-56 w-56 rounded-full bg-blue-700/20 blur-3xl" />
         <div className="absolute top-40 -right-10 h-72 w-72 rounded-full bg-indigo-600/20 blur-3xl" />
       </div>
 
-      {/* Welcome / Profile Banner */}
+      {/* 🧊 Sticky Glass Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/5 border-b border-white/10 px-5 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/20">
+            {stats.school.logo ? (
+              <Image
+                src={stats.school.logo}
+                alt={stats.school.name}
+                width={40}
+                height={40}
+                className="object-contain"
+              />
+            ) : (
+              <span className="text-blue-400 font-bold text-lg grid place-items-center">
+                {stats.school.name.charAt(0)}
+              </span>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white/90 leading-tight">
+              {stats.school.name}
+            </h3>
+            <p className="text-xs text-blue-400/80">Student Portal</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Link
+            href="/portal/student/notifications"
+            className="relative text-white/60 hover:text-blue-400 transition"
+          >
+            <Bell className="w-5 h-5" />
+            {stats.unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
+            )}
+          </Link>
+          <div className="relative w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400 flex items-center justify-center text-sm font-semibold text-blue-300">
+            {stats.name.charAt(0)}
+          </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem("acadexUser");
+              window.location.href = "/portal";
+            }}
+            className="text-red-400 hover:text-red-500 transition"
+            title="Logout"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+
+      {/* Welcome / Profile banner */}
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-8 shadow-2xl"
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-8 shadow-2xl mt-2"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-                className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-400 to-cyan-500 opacity-30 blur-md"
-              ></motion.div>
-              <div className="relative w-16 h-16 rounded-full bg-white/10 border border-white/20 overflow-hidden flex items-center justify-center shadow-inner">
-                {stats.school.logo ? (
-                  <Image
-                    src={stats.school.logo}
-                    alt={stats.school.name}
-                    width={64}
-                    height={64}
-                    className="object-contain"
-                  />
-                ) : (
-                  <span className="text-lg font-bold text-blue-400">
-                    {stats.school.name.charAt(0)}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-blue-400">{stats.school.name}</h3>
-              <p
-                className={`text-sm mt-1 ${
-                  stats.approvalStatus === "approved"
-                    ? "text-emerald-400"
-                    : "text-yellow-400"
-                }`}
-              >
-                {stats.approvalStatus === "approved"
-                  ? "✅ Approved"
-                  : "⏳ Pending Approval"}
-              </p>
-            </div>
-          </div>
-
-          <div className="text-right">
-            <h2 className="text-2xl font-semibold tracking-tight">
+          <div>
+            <p className="text-white/70 text-sm">
+              {stats.approvalStatus === "approved"
+                ? "✅ Approved"
+                : "⏳ Pending approval"}
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight">
               Welcome back, {stats.name} 👋
             </h2>
-            <p className="mt-2 text-white/70 text-sm">
+            <p className="mt-2 text-white/60 text-sm">
               Roll No:{" "}
-              <span className="font-medium text-white/90">{stats.rollNumber}</span> •{" "}
+              <span className="font-medium text-white/80">{stats.rollNumber}</span> •{" "}
               Admission No:{" "}
-              <span className="font-medium text-white/90">{stats.admissionNo}</span>
+              <span className="font-medium text-white/80">{stats.admissionNo}</span>
             </p>
-            <p className="text-white/60 text-sm mt-1">
-              Dept: <span className="font-medium text-white/80">{stats.department}</span>{" "}
-              • Level:{" "}
+            <p className="mt-1 text-white/60 text-sm">
+              Dept:{" "}
+              <span className="font-medium text-white/80">{stats.department}</span> •{" "}
+              Level/Class:{" "}
               <span className="font-medium text-white/80">{stats.levelOrClass}</span>
             </p>
           </div>
@@ -153,20 +171,20 @@ export default function StudentDashboardPage() {
         </div>
       </motion.section>
 
-      {/* Top Stat Cards */}
+      {/* Quick stat cards */}
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.05 }}
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
         <DashCard
           href="/portal/student/exams"
-          title="Exams"
+          title="Exams Hub"
           value="All Exams"
           icon={<ClipboardList className="size-5" />}
           gradient="from-blue-500 to-cyan-500"
-          subtitle="Access live and resit exams"
+          subtitle="Write live and resit exams"
         />
         <DashCard
           href="/portal/student/results"
@@ -190,7 +208,7 @@ export default function StudentDashboardPage() {
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
+        transition={{ delay: 0.1 }}
         className="grid gap-4 lg:grid-cols-3"
       >
         <WideCard
@@ -203,36 +221,17 @@ export default function StudentDashboardPage() {
         <WideCard
           href="/portal/student/leaderboard"
           title="Leaderboard"
-          description="See how you rank among classmates and departments."
+          description="See how you rank among classmates."
           icon={<Medal className="size-5" />}
           gradient="from-amber-400 to-orange-500"
         />
         <WideCard
           href="/portal/student/profile"
           title="Profile & Settings"
-          description="Edit contact details or password securely."
+          description="Update details or change password."
           icon={<Settings className="size-5" />}
           gradient="from-emerald-500 to-teal-600"
         />
-      </motion.section>
-
-      {/* Performance placeholder */}
-      <motion.section
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center"
-      >
-        <h3 className="text-sm font-semibold tracking-tight mb-3 text-blue-300">
-          Recent Performance Trend
-        </h3>
-        <p className="text-sm text-white/60">
-          Visit{" "}
-          <Link href="/portal/student/analytics" className="underline text-blue-400">
-            Analytics
-          </Link>{" "}
-          for your latest graphs and statistics.
-        </p>
       </motion.section>
 
       {/* Footer */}
@@ -243,8 +242,7 @@ export default function StudentDashboardPage() {
   );
 }
 
-/* -------- UI Components -------- */
-
+/* ---- Card Components ---- */
 function DashCard({
   href,
   title,
@@ -312,7 +310,7 @@ function WideCard({
         />
         <div className="flex items-start gap-3">
           <div
-            className={`mt-0.5 h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg shadow-black/30`}
+            className={`mt-0.5 h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg`}
           >
             {icon}
           </div>
