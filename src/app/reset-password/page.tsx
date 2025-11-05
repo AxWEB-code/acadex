@@ -90,7 +90,7 @@ function ResetPasswordContent() {
             <p>
               Please go back to{" "}
               <a
-                href="/portal/login"
+                href="/select-school/portsal"
                 className="text-blue-400 hover:underline"
               >
                 Forgot Password
