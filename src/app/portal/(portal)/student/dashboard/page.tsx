@@ -25,35 +25,32 @@ type MiniStats = {
   approvalStatus: "approved" | "pending";
   averageScore: number;
   unreadNotifications: number;
-  school: { name: string; logo?: string };
+  school: { name: string; logo?: string; subdomain?: string };
 };
 
 export default function StudentDashboardPage() {
-  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<MiniStats | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const mock: MiniStats = {
-        name: "John Doe",
-        rollNumber: "ECNS2025-015",
-        admissionNo: "ADM-2025-1203",
-        department: "Computer Science",
-        levelOrClass: "200 Level",
-        approvalStatus: "approved",
-        averageScore: 82,
-        unreadNotifications: 3,
-        school: {
-          name: "Ezeala College",
-          logo: "/acadex-logo.png", // TODO: dynamic from backend
-        },
-      };
-      setStats(mock);
-      setLoading(false);
-    })();
+    const mock: MiniStats = {
+      name: "John Doe",
+      rollNumber: "ECNS2025-015",
+      admissionNo: "ADM-2025-1203",
+      department: "Computer Science",
+      levelOrClass: "200 Level",
+      approvalStatus: "approved",
+      averageScore: 82,
+      unreadNotifications: 3,
+      school: {
+        name: "Ezeala College",
+        logo: "/acadex-logo.png", // TODO: dynamic later
+        subdomain: "ezealacollege.acadex.app",
+      },
+    };
+    setStats(mock);
   }, []);
 
-  if (loading || !stats)
+  if (!stats)
     return (
       <div className="fixed inset-0 grid place-items-center bg-black/40 backdrop-blur-sm">
         <div className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm">
@@ -70,64 +67,62 @@ export default function StudentDashboardPage() {
         <div className="absolute top-40 -right-10 h-72 w-72 rounded-full bg-indigo-600/20 blur-3xl" />
       </div>
 
-      {/* 🧊 Sticky Glass Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/5 border-b border-white/10 px-5 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/20">
-            {stats.school.logo ? (
-              <Image
-                src={stats.school.logo}
-                alt={stats.school.name}
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            ) : (
-              <span className="text-blue-400 font-bold text-lg grid place-items-center">
-                {stats.school.name.charAt(0)}
-              </span>
-            )}
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white/90 leading-tight">
-              {stats.school.name}
-            </h3>
-            <p className="text-xs text-blue-400/80">Student Portal</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Link
-            href="/portal/student/notifications"
-            className="relative text-white/60 hover:text-blue-400 transition"
-          >
-            <Bell className="w-5 h-5" />
-            {stats.unreadNotifications > 0 && (
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
-            )}
-          </Link>
-          <div className="relative w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400 flex items-center justify-center text-sm font-semibold text-blue-300">
-            {stats.name.charAt(0)}
-          </div>
-          <button
-            onClick={() => {
-              localStorage.removeItem("acadexUser");
-              window.location.href = "/portal";
-            }}
-            className="text-red-400 hover:text-red-500 transition"
-            title="Logout"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
-
-      {/* Welcome / Profile banner */}
+      {/* 🏫 Welcome / Profile banner */}
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-8 shadow-2xl mt-2"
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-8 shadow-2xl"
       >
+        {/* Top Row — School Info + Notification + Logout */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/10">
+              {stats.school.logo ? (
+                <Image
+                  src={stats.school.logo}
+                  alt={stats.school.name}
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              ) : (
+                <span className="text-blue-400 font-bold text-lg grid place-items-center">
+                  {stats.school.name.charAt(0)}
+                </span>
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                {stats.school.name}
+              </h3>
+              <p className="text-xs text-blue-400/80">{stats.school.subdomain}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link
+              href="/portal/student/notifications"
+              className="relative text-white/60 hover:text-blue-400 transition"
+            >
+              <Bell className="w-5 h-5" />
+              {stats.unreadNotifications > 0 && (
+                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
+              )}
+            </Link>
+            <button
+              onClick={() => {
+                localStorage.removeItem("acadexUser");
+                window.location.href = "/portal";
+              }}
+              className="text-red-400 hover:text-red-500 transition"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Middle Info Row — Student Details */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div>
             <p className="text-white/70 text-sm">
@@ -140,15 +135,23 @@ export default function StudentDashboardPage() {
             </h2>
             <p className="mt-2 text-white/60 text-sm">
               Roll No:{" "}
-              <span className="font-medium text-white/80">{stats.rollNumber}</span> •{" "}
-              Admission No:{" "}
-              <span className="font-medium text-white/80">{stats.admissionNo}</span>
+              <span className="font-medium text-white/80">
+                {stats.rollNumber}
+              </span>{" "}
+              • Admission No:{" "}
+              <span className="font-medium text-white/80">
+                {stats.admissionNo}
+              </span>
             </p>
             <p className="mt-1 text-white/60 text-sm">
               Dept:{" "}
-              <span className="font-medium text-white/80">{stats.department}</span> •{" "}
-              Level/Class:{" "}
-              <span className="font-medium text-white/80">{stats.levelOrClass}</span>
+              <span className="font-medium text-white/80">
+                {stats.department}
+              </span>{" "}
+              • Level/Class:{" "}
+              <span className="font-medium text-white/80">
+                {stats.levelOrClass}
+              </span>
             </p>
           </div>
 
@@ -171,7 +174,7 @@ export default function StudentDashboardPage() {
         </div>
       </motion.section>
 
-      {/* Quick stat cards */}
+      {/* Cards Section */}
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -192,7 +195,7 @@ export default function StudentDashboardPage() {
           value="View Scores"
           icon={<GraduationCap className="size-5" />}
           gradient="from-emerald-500 to-teal-500"
-          subtitle="Check your grades and remarks"
+          subtitle="Check your grades"
         />
         <DashCard
           href="/portal/student/notifications"
@@ -224,6 +227,7 @@ export default function StudentDashboardPage() {
           description="See how you rank among classmates."
           icon={<Medal className="size-5" />}
           gradient="from-amber-400 to-orange-500"
+          short
         />
         <WideCard
           href="/portal/student/profile"
@@ -231,6 +235,7 @@ export default function StudentDashboardPage() {
           description="Update details or change password."
           icon={<Settings className="size-5" />}
           gradient="from-emerald-500 to-teal-600"
+          short
         />
       </motion.section>
 
@@ -291,19 +296,23 @@ function WideCard({
   description,
   icon,
   gradient,
+  short,
 }: {
   href: string;
   title: string;
   description: string;
   icon: React.ReactNode;
   gradient: string;
+  short?: boolean;
 }) {
   return (
     <Link href={href}>
       <motion.div
         whileHover={{ y: -3, scale: 1.01 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg"
+        className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg ${
+          short ? "h-[130px]" : "h-[160px]"
+        }`}
       >
         <div
           className={`absolute -right-8 -top-10 h-28 w-28 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`}
