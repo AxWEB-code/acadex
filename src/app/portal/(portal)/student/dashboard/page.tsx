@@ -121,14 +121,14 @@ if (!stored) {
   );
 }
 
-return (
-  <div className="fixed inset-0 grid place-items-center bg-black/40 backdrop-blur-sm">
-    <div className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm text-center break-words max-w-[90%]">
-      📦 acadexUser data found:<br />
-      {stored}
-    </div>
-  </div>
-);
+//return (
+  //<div className="fixed inset-0 grid place-items-center bg-black/40 backdrop-blur-sm">
+    //<div className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm text-center break-words max-w-[90%]">
+     // 📦 acadexUser data found:<br />
+     // {stored}
+   // </div>
+  //</div>
+//);
 
 
   if (!stats)
@@ -181,7 +181,8 @@ return (
 
             <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/10">
 
-              {stats.school.logo ? (
+              {stats?.school?.logo ? (
+
 
                 <Image
 
