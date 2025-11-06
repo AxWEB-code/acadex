@@ -1,6 +1,6 @@
 ﻿// src/app/portal/(portal)/student/layout.tsx
 
-"use client"; // ADD THIS LINE
+"use client";
 
 import type { ReactNode } from "react";
 import { Bell, LogOut } from "lucide-react";
@@ -14,7 +14,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#0b0f1a] text-white antialiased">
-        {/* Top header */}
+        {/* Top header - STICKY */}
         <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0b0f1a]/80 via-[#0b0f1a]/60 to-[#0b0f1a]/80 backdrop-blur-xl border-b border-white/5">
           <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
