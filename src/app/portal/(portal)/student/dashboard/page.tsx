@@ -484,9 +484,11 @@ function DashCard({
 
           <div>
 
-            <p className="text-xs uppercase tracking-wider text-white/60">{title}</p>
+            {/* CHANGED: Added gradient text color to match icon */}
 
-            <p className="mt-1 text-3xl font-bold">{value}</p>
+            <p className={`text-xs uppercase tracking-wider bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}>{title}</p>
+
+            <p className="mt-1 text-3xl font-bold text-white">{value}</p>
 
           </div>
 
@@ -580,7 +582,9 @@ function WideCard({
 
           <div>
 
-            <h4 className="text-base font-semibold">{title}</h4>
+            {/* CHANGED: Added gradient text color to match icon */}
+
+            <h4 className={`text-base font-semibold bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}>{title}</h4>
 
             <p className="mt-1 text-sm text-white/70">{description}</p>
 
