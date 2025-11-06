@@ -101,6 +101,8 @@ const token = stored ? JSON.parse(stored).token : null;
   };
 
   console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+  console.log("📦 LocalStorage (acadexUser):", localStorage.getItem("acadexUser"));
+
 
 
   fetchStudent();
