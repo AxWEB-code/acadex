@@ -14,9 +14,9 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#0b0f1a] text-white antialiased">
-        {/* Top header - FIXED POSITION */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0b0f1a]/80 via-[#0b0f1a]/60 to-[#0b0f1a]/80 backdrop-blur-xl border-b border-white/5">
-          <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+        {/* Top header - PROPER FIXED HEADER */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0b0f1a] to-[#0b0f1a] border-b border-white/5">
+          <div className="mx-auto max-w-6xl w-full px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20" />
               <div>
@@ -29,11 +29,9 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                 <a href="/portal/student/dashboard" className="px-3 py-2 rounded-lg hover:bg-white/5">Dashboard</a>
                 <a href="/portal/student/exams" className="px-3 py-2 rounded-lg hover:bg-white/5">Exams</a>
                 <a href="/portal/student/results" className="px-3 py-2 rounded-lg hover:bg-white/5">Results</a>
-                {/* REMOVED: Notifications nav link */}
                 <a href="/portal/student/analytics" className="px-3 py-2 rounded-lg hover:bg-white/5">Analytics</a>
                 <a href="/portal/student/profile" className="px-3 py-2 rounded-lg hover:bg-white/5">Profile</a>
               </nav>
-              {/* ADDED: Notification and Logout icons in header */}
               <div className="flex items-center gap-4">
                 <a
                   href="/portal/student/notifications"
@@ -54,8 +52,12 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
           </div>
         </header>
         
-        {/* Page content container - ADDED PADDING TOP TO ACCOUNT FOR FIXED HEADER */}
-        <main className="mx-auto max-w-6xl px-4 pt-24 pb-8">{children}</main>
+        {/* Page content - PROPER SPACING */}
+        <main className="pt-20">
+          <div className="mx-auto max-w-6xl px-4 py-8">
+            {children}
+          </div>
+        </main>
       </body>
     </html>
   );
