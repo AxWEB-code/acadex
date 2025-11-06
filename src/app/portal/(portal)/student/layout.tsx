@@ -24,16 +24,16 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                 <h1 className="text-base font-semibold tracking-tight">Portal</h1>
               </div>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
+              {/* Navigation - Hidden on mobile, shown on sm and up */}
               <nav className="hidden sm:flex items-center gap-1 text-sm">
                 <a href="/portal/student/dashboard" className="px-3 py-2 rounded-lg hover:bg-white/5">Dashboard</a>
                 <a href="/portal/student/exams" className="px-3 py-2 rounded-lg hover:bg-white/5">Exams</a>
                 <a href="/portal/student/results" className="px-3 py-2 rounded-lg hover:bg-white/5">Results</a>
-                {/* REMOVED: Notifications nav link */}
                 <a href="/portal/student/analytics" className="px-3 py-2 rounded-lg hover:bg-white/5">Analytics</a>
                 <a href="/portal/student/profile" className="px-3 py-2 rounded-lg hover:bg-white/5">Profile</a>
               </nav>
-              {/* ADDED: Notification and Logout icons in header */}
+              {/* Icons - Always visible */}
               <div className="flex items-center gap-4">
                 <a
                   href="/portal/student/notifications"
