@@ -111,7 +111,12 @@ const token = stored ? JSON.parse(stored).token : null;
 
   if (!stats)
   return (
-    <div className="space-y-8 relative px-6 py-10">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-8 relative px-6 py-10"
+    >
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-16 -left-10 h-56 w-56 rounded-full bg-blue-700/10 blur-3xl" />
@@ -154,9 +159,8 @@ const token = stored ? JSON.parse(stored).token : null;
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
-
 
 
   return (

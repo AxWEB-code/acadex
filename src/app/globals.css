@@ -37,7 +37,7 @@ select option {
   color: #fff; /* white text */
 }
 
-/* 🌈 AcadeX shimmer effect */
+/* 🌌 AcadeX Signature Shimmer */
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
@@ -50,10 +50,12 @@ select option {
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.08) 25%,
-    rgba(255, 255, 255, 0.15) 37%,
-    rgba(255, 255, 255, 0.08) 63%
+    rgba(59, 130, 246, 0.08) 25%,  /* soft blue start */
+    rgba(147, 51, 234, 0.15) 37%,  /* purple highlight */
+    rgba(59, 130, 246, 0.08) 63%   /* fade back to blue */
   );
   background-size: 1000px 100%;
   animation: shimmer 2s infinite linear;
+  border-radius: 0.5rem;
+  backdrop-filter: blur(2px);
 }
