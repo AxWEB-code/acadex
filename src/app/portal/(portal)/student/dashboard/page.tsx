@@ -108,6 +108,28 @@ const token = stored ? JSON.parse(stored).token : null;
   fetchStudent();
 }, []);
 
+const stored = typeof window !== "undefined" ? localStorage.getItem("acadexUser") : null;
+
+if (!stored) {
+  return (
+    <div className="fixed inset-0 grid place-items-center bg-black/40 backdrop-blur-sm">
+      <div className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm text-center">
+        ⚠️ No acadexUser found in localStorage.<br />
+        Please log in again on this device.
+      </div>
+    </div>
+  );
+}
+
+return (
+  <div className="fixed inset-0 grid place-items-center bg-black/40 backdrop-blur-sm">
+    <div className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm text-center break-words max-w-[90%]">
+      📦 acadexUser data found:<br />
+      {stored}
+    </div>
+  </div>
+);
+
 
   if (!stats)
 
