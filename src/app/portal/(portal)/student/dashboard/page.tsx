@@ -57,7 +57,9 @@ export default function StudentDashboardPage() {
   const [stats, setStats] = useState<MiniStats | null>(null);
 
   useEffect(() => {
-  const token = localStorage.getItem("acadexUser");
+  const stored = localStorage.getItem("acadexUser");
+const token = stored ? JSON.parse(stored).token : null;
+
 
   if (!token) {
     window.location.href = "/portal";
@@ -66,7 +68,7 @@ export default function StudentDashboardPage() {
 
   const fetchStudent = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/students/profile/me`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/students/profile/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
