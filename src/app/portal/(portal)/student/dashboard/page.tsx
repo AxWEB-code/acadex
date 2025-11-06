@@ -378,6 +378,8 @@ export default function StudentDashboardPage() {
 
           gradient="from-fuchsia-500 to-violet-600"
 
+          short // CHANGED: Added short prop to match height
+
         />
 
         <WideCard
