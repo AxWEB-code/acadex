@@ -57,40 +57,50 @@ export default function StudentDashboardPage() {
   const [stats, setStats] = useState<MiniStats | null>(null);
 
   useEffect(() => {
+  const token = localStorage.getItem("acadexUser");
 
-    const mock: MiniStats = {
+  if (!token) {
+    window.location.href = "/portal";
+    return;
+  }
 
-      name: "John Doe",
+  const fetchStudent = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/students/profile/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      rollNumber: "ECNS2025-015",
+      if (!res.ok) {
+        throw new Error("Failed to fetch student data");
+      }
 
-      admissionNo: "ADM-2025-1203",
+      const student = await res.json();
 
-      department: "Computer Science",
+      setStats({
+        name: `${student.firstName} ${student.lastName}`,
+        rollNumber: student.rollNumber,
+        admissionNo: student.admissionNo,
+        department: student.department?.name || "N/A",
+        levelOrClass: student.level || student.class || "N/A",
+        approvalStatus: student.approvalStatus,
+        averageScore: student.performance?.averageScore || 0,
+        unreadNotifications: 0, // 🔹 can update later
+        school: {
+          name: student.school?.name || "N/A",
+          logo: student.school?.logo || "/acadex-logo.png",
+          subdomain: student.school?.subdomain || "",
+        },
+      });
+    } catch (error) {
+      console.error("Error loading student profile:", error);
+    }
+  };
 
-      levelOrClass: "200 Level",
+  fetchStudent();
+}, []);
 
-      approvalStatus: "approved",
-
-      averageScore: 82,
-
-      unreadNotifications: 3,
-
-      school: {
-
-        name: "Ezeala College",
-
-        logo: "/acadex-logo.png", // TODO: dynamic later
-
-        subdomain: "ezealacollege.acadex.app",
-
-      },
-
-    };
-
-    setStats(mock);
-
-  }, []);
 
   if (!stats)
 
