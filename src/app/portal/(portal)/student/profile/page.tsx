@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,18 +16,63 @@ import {
   Pencil,
   Laptop,
   Download,
-  Clock3,
+  Trash2,
 } from "lucide-react";
 
+/* ------------------ Type Definitions ------------------ */
+interface School {
+  name: string;
+  logo?: string;
+}
+
+interface Department {
+  name: string;
+}
+
+interface StudentProfile {
+  firstName: string;
+  lastName: string;
+  admissionNo: string;
+  rollNumber: string;
+  department?: Department;
+  level?: string;
+  class?: string;
+  school?: School;
+  contactNumber?: string;
+  email?: string;
+  dob?: string;
+}
+
+interface CardProps {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}
+
+interface ReadProps {
+  label: string;
+  value: string | undefined;
+}
+
+interface EditableProps {
+  label: string;
+  value: string | undefined;
+  icon?: React.ReactNode;
+  editable: boolean;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  name: string;
+  type?: string;
+}
+
+/* ------------------ Component ------------------ */
 export default function StudentProfilePage() {
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ contactNumber: "", email: "", dob: "" });
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+  const [form, setForm] = useState({
+    contactNumber: "",
+    email: "",
+    dob: "",
   });
   const [toast, setToast] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -46,7 +91,7 @@ export default function StudentProfilePage() {
           `${process.env.NEXT_PUBLIC_API_URL}/api/students/profile/me`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        const data = await res.json();
+        const data: StudentProfile = await res.json();
         setProfile(data);
         setForm({
           contactNumber: data.contactNumber || "",
@@ -62,7 +107,7 @@ export default function StudentProfilePage() {
     fetchProfile();
   }, []);
 
-  const handleChange = (e: any) =>
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSave = () => {
@@ -73,6 +118,26 @@ export default function StudentProfilePage() {
       setToast("✅ Profile updated successfully!");
       setTimeout(() => setToast(null), 3000);
     }, 1200);
+  };
+
+  const handleExportData = () => {
+    if (!profile) return;
+    const blob = new Blob([JSON.stringify(profile, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${profile.firstName}_${profile.lastName}_acadex_profile.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setToast("📁 Data exported successfully!");
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleDeactivateRequest = () => {
+    setToast("🧾 Account deactivation request sent to admin.");
+    setTimeout(() => setToast(null), 3000);
   };
 
   /* --- SHIMMER STYLE for skeletons --- */
@@ -103,23 +168,9 @@ export default function StudentProfilePage() {
       </div>
     );
 
-  const handleExportData = () => {
-    const blob = new Blob([JSON.stringify(profile, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${profile.firstName}_${profile.lastName}_acadex_profile.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-    setToast("📁 Data exported successfully!");
-    setTimeout(() => setToast(null), 3000);
-  };
-
   return (
     <div className="space-y-8 relative px-4 sm:px-8 pb-10">
-      {/* 🎨 Background gradient + glows */}
+      {/* Background gradient */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-16 -left-10 h-56 w-56 rounded-full bg-blue-700/25 blur-3xl" />
         <div className="absolute top-40 -right-10 h-72 w-72 rounded-full bg-indigo-600/25 blur-3xl" />
@@ -129,7 +180,7 @@ export default function StudentProfilePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-white tracking-tight">
-          Profile & Settings
+          Profile &amp; Settings
         </h1>
         <button
           onClick={() => setEditMode(!editMode)}
@@ -139,7 +190,7 @@ export default function StudentProfilePage() {
         </button>
       </div>
 
-      {/* 🪪 Personal Info */}
+      {/* Personal Info */}
       <Card title="Personal Information" icon={<UserRound className="size-4" />}>
         <div className="flex items-center gap-5 mb-5">
           <div className="relative w-16 h-16 rounded-full overflow-hidden border border-white/20 bg-white/10">
@@ -171,7 +222,7 @@ export default function StudentProfilePage() {
         </div>
       </Card>
 
-      {/* ☎️ Contact Info */}
+      {/* Contact Info */}
       <Card title="Contact Information" icon={<Phone className="size-4" />}>
         <Editable
           label="Email"
@@ -210,40 +261,35 @@ export default function StudentProfilePage() {
         )}
       </Card>
 
-      {/* 🎓 Academic Info */}
+      {/* Academic Info */}
       <Card title="Academic Information" icon={<BookOpen className="size-4" />}>
         <Read label="School" value={profile.school?.name} />
         <Read label="Department" value={profile.department?.name} />
         <Read label="Level / Class" value={profile.level || profile.class} />
       </Card>
 
-      {/* 🔐 Security */}
+      {/* Security */}
       <Card title="Security Settings" icon={<Lock className="size-4" />}>
         <p className="text-xs text-white/60 mb-3">
           For security reasons, re-enter your current password before changing to a new one.
         </p>
-
         <div className="grid sm:grid-cols-3 gap-3">
-          {["Current", "New", "Confirm New"].map((label, i) => (
+          {["Current", "New", "Confirm New"].map((label) => (
             <input
-              key={i}
+              key={label}
               type="password"
               placeholder={`${label} Password`}
               className="px-3 py-2 rounded-lg bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 text-sm"
             />
           ))}
         </div>
-
         <button className="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:opacity-90 transition text-white text-sm flex items-center gap-2">
           <Lock size={14} /> Update Password
         </button>
       </Card>
 
-      {/* 💻 Device Management */}
+      {/* Device Management */}
       <Card title="Device Management" icon={<Laptop className="size-4" />}>
-        <p className="text-sm text-white/70 mb-2">
-          View and manage your current login sessions.
-        </p>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-3 text-sm text-white/80 flex justify-between">
           <div>
             <p>Device: Android Chrome</p>
@@ -253,19 +299,7 @@ export default function StudentProfilePage() {
         </div>
       </Card>
 
-      {/* 🕒 Activity History */}
-      <Card title="Activity History" icon={<Clock3 className="size-4" />}>
-        <p className="text-sm text-white/70 mb-2">
-          Your recent activity on AcadeX:
-        </p>
-        <ul className="space-y-2 text-sm text-white/80">
-          <li>✅ Logged in - 2 days ago</li>
-          <li>🧾 Viewed result for "Maths - 2024/2025 First Term"</li>
-          <li>🧠 Completed exam: Physics CBT</li>
-        </ul>
-      </Card>
-
-      {/* 💾 Data Export */}
+      {/* Data Export */}
       <Card title="Data Export / Backup" icon={<Download className="size-4" />}>
         <p className="text-sm text-white/70 mb-3">
           Download your AcadeX profile and academic data as a backup file.
@@ -278,21 +312,30 @@ export default function StudentProfilePage() {
         </button>
       </Card>
 
-      {/* 🚪 Account */}
+      {/* Account Controls */}
       <Card title="Account Controls" icon={<UserRound className="size-4" />}>
-        <button
-          onClick={() => {
-            localStorage.removeItem("acadexUser");
-            window.location.href = "/portal";
-          }}
-          className="w-full px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm flex items-center gap-2 justify-center transition"
-        >
-          <LogOut size={14} /> Logout
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={() => {
+              localStorage.removeItem("acadexUser");
+              window.location.href = "/portal";
+            }}
+            className="w-full px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm flex items-center gap-2 justify-center transition"
+          >
+            <LogOut size={14} /> Logout
+          </button>
+
+          <button
+            onClick={handleDeactivateRequest}
+            className="w-full px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm flex items-center gap-2 justify-center transition"
+          >
+            <Trash2 size={14} /> Request Account Deactivation
+          </button>
+        </div>
       </Card>
 
       <p className="text-xs text-center text-white/40 pt-4">
-        All updates are securely handled by your school’s admin.
+        All updates are securely handled by your school&apos;s admin.
       </p>
 
       <AnimatePresence>
@@ -311,8 +354,8 @@ export default function StudentProfilePage() {
   );
 }
 
-/* --- Reusable Components --- */
-function Card({ title, icon, children }: any) {
+/* ------------------ Reusable Components ------------------ */
+function Card({ title, icon, children }: CardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -328,7 +371,7 @@ function Card({ title, icon, children }: any) {
   );
 }
 
-function Read({ label, value }: { label: string; value: string }) {
+function Read({ label, value }: ReadProps) {
   return (
     <div className="bg-white/[0.03] border border-white/10 p-3 rounded-xl text-sm">
       <p className="text-[11px] text-white/50">{label}</p>
@@ -345,7 +388,7 @@ function Editable({
   onChange,
   name,
   type = "text",
-}: any) {
+}: EditableProps) {
   return (
     <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 p-3 rounded-xl text-sm">
       {icon && <span className="text-blue-400">{icon}</span>}
