@@ -86,6 +86,7 @@ export default function PortalLoginPage() {
     term: "",
     academicYear: "",
     contactNumber: "",
+    role: "",
   });
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
@@ -188,86 +189,89 @@ export default function PortalLoginPage() {
     }
   };
 
-  // ✅ FIXED handleLogin with proper typing
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!form.email || !form.password) {
-      setToast({ msg: "Please fill in all fields.", type: "error" });
-      setTimeout(() => setToast(null), 3000);
-      return;
+  // ✅ Basic field validation
+  if (!form.email || !form.password) {
+    setToast({ msg: "Please fill in all fields.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
+    return;
+  }
+
+  // ✅ Extra validation for admin role
+  if (isAdmin && !form.role) {
+    setToast({ msg: "Please select your admin role.", type: "error" });
+    setTimeout(() => setToast(null), 3000);
+    return;
+  }
+
+  setLoading(true);
+  setMessage("");
+
+  try {
+    const endpoint = isAdmin
+      ? `${API_BASE}/api/auth/admin/login`
+      : `${API_BASE}/api/students/login`;
+
+    // ✅ Include role only if admin
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: form.email,
+        password: form.password,
+        schoolSubdomain: school?.subdomain,
+        ...(isAdmin && { role: form.role }),
+      }),
+    });
+
+    // ✅ Handle response safely
+    let data: LoginResponse = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
     }
 
-    setLoading(true);
-    setMessage("");
-
-    try {
-      const endpoint = isAdmin
-  ? `${API_BASE}/api/auth/admin/login`
-  : `${API_BASE}/api/students/login`;
-
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-          schoolSubdomain: school?.subdomain,
-        }),
-      });
-
-      // ✅ FIXED: Proper typing instead of 'any'
-      let data: LoginResponse = {};
-      try {
-        data = await response.json();
-      } catch {
-        data = {};
-      }
-
-      if (response.ok && data.token) {
-        setToast({
-          msg: "✅ Login successful! Redirecting...",
-          type: "success",
-        });
-        setTimeout(() => {
-          localStorage.setItem("acadexUser", JSON.stringify(data));
-          window.location.href = isAdmin
-            ? "/portal/admin/dashboard"
-            : "/portal/student/dashboard";
-        }, 1500);
-      } else {
-        // ✅ Properly show backend error message instead of "network error"
-        setShake(true);
-        setToast({
-          msg:
-            data.error ||
-            (response.status === 401
-              ? "❌ Incorrect email or password."
-              : "⚠️ Login failed. Please try again."),
-          type: "error",
-        });
-        setTimeout(() => {
-          setShake(false);
-          setToast(null);
-        }, 3500);
-      }
-    } catch {
-      // ✅ FIXED: Removed unused 'error' parameter
-      // Only runs if backend cannot be reached at all
+    if (response.ok && data.token) {
+      setToast({ msg: "✅ Login successful! Redirecting...", type: "success" });
+      setTimeout(() => {
+        localStorage.setItem("acadexUser", JSON.stringify(data));
+        window.location.href = isAdmin
+          ? "/portal/admin/dashboard"
+          : "/portal/student/dashboard";
+      }, 1500);
+    } else {
       setShake(true);
       setToast({
-        msg: "🚫 Server unreachable. Check your internet or try again later.",
+        msg:
+          data.error ||
+          (response.status === 401
+            ? "❌ Incorrect email or password."
+            : "⚠️ Login failed. Please try again."),
         type: "error",
       });
       setTimeout(() => {
         setShake(false);
         setToast(null);
       }, 3500);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch {
+    setShake(true);
+    setToast({
+      msg: "🚫 Server unreachable. Check your internet or try again later.",
+      type: "error",
+    });
+    setTimeout(() => {
+      setShake(false);
+      setToast(null);
+    }, 3500);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -368,6 +372,7 @@ if (res.student) {
           term: "",
           academicYear: "",
           contactNumber: "",
+          role: "",
         });
         setIsRegister(false);
         setStep(1);
@@ -526,7 +531,7 @@ if (res.student) {
           href="/select-school"
           className="flex items-center gap-2 bg-white/10 backdrop-blur-lg border border-white/10 px-3 py-2 rounded-full text-gray-300 hover:text-blue-400 text-sm shadow-md transition"
         >
-          <ArrowLeft size={16} /> Back to School
+          <ArrowLeft size={16} /> Back to Schools
         </Link>
       </div>
 
@@ -648,6 +653,22 @@ if (res.student) {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {/* ✅ Admin Role Selector */}
+    {isAdmin && (
+  <select
+    name="role"
+    value={form.role}
+    onChange={handleChange}
+    className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 text-white appearance-none focus:ring-2 focus:ring-blue-500"
+  >
+    <option value="">Select Role</option>
+    <option value="mainAdmin">Main Admin</option>
+    <option value="examAdmin">Exam Admin</option>
+    <option value="resultAdmin">Result Admin</option>
+    <option value="admissionAdmin">Admission Admin</option>
+  </select>
+)}
+
               <div className="text-right text-xs text-gray-400">
                 <span
                   onClick={() => setIsForgot(true)}
