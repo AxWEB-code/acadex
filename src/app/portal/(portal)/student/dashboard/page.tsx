@@ -8,7 +8,7 @@ import {
 
   Bell,
 
-  Trophy,
+  //Trophy,
 
   ChartLine,
 
@@ -22,7 +22,7 @@ import {
 
   Medal,
 
-  LogOut,
+  //LogOut,
 
 } from "lucide-react";
 
