@@ -237,10 +237,34 @@ export default function PortalLoginPage() {
     if (response.ok && data.token) {
       setToast({ msg: "✅ Login successful! Redirecting...", type: "success" });
       setTimeout(() => {
-        localStorage.setItem("acadexUser", JSON.stringify(data));
-        window.location.href = isAdmin
-          ? "/portal/admin/dashboard"
-          : "/portal/student/dashboard";
+        localStorage.setItem(
+  "acadexUser",
+  JSON.stringify({ ...data, role: form.role })
+);
+
+        if (isAdmin) {
+  // 🔹 Role-based redirect for admin users
+  switch (form.role) {
+    case "mainAdmin":
+      window.location.href = "/portal/admin/dashboard";
+      break;
+    case "admissionAdmin":
+      window.location.href = "/portal/admission/dashboard";
+      break;
+    case "examAdmin":
+      window.location.href = "/portal/exam/dashboard";
+      break;
+    case "resultAdmin":
+      window.location.href = "/portal/result/dashboard";
+      break;
+    default:
+      window.location.href = "/portal/admin/dashboard"; // fallback
+      break;
+  }
+} else {
+  window.location.href = "/portal/student/dashboard";
+}
+
       }, 1500);
     } else {
       setShake(true);
