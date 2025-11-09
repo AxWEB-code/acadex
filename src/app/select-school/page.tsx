@@ -27,6 +27,56 @@ export default function SelectSchoolPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // 🔐 Super Access State
+  const [showSuperModal, setShowSuperModal] = useState(false);
+  const [superKey, setSuperKey] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
+  // Triple-click state
+  const [clickCount, setClickCount] = useState(0);
+  const [lastClickAt, setLastClickAt] = useState<number | null>(null);
+
+  // Long-press timer ref
+  let longPressTimer: number | undefined;
+
+  // 🖱️ Desktop: triple-click within 600ms
+  const handleTripleClick = () => {
+    const now = Date.now();
+    if (lastClickAt && now - lastClickAt <= 600) {
+      const next = clickCount + 1;
+      setClickCount(next);
+      setLastClickAt(now);
+      if (next >= 3) {
+        setClickCount(0);
+        setShowSuperModal(true);
+      }
+    } else {
+      setClickCount(1);
+      setLastClickAt(now);
+    }
+  };
+
+  // 📱 Mobile: long-press (~700ms)
+  const onTechPointerDown = () => {
+    // @ts-ignore
+    longPressTimer = window.setTimeout(() => {
+      setShowSuperModal(true);
+    }, 700);
+  };
+
+  const onTechPointerUp = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = undefined;
+    }
+  };
+
+  const verifySuperKey = async () => {
+    setVerifying(true);
+    // You can swap this out to POST to your backend if you prefer server validation first.
+    window.location.href = `/sys-verify?key=${encodeURIComponent(superKey.trim())}`;
+  };
+
   useEffect(() => {
     async function loadSchools() {
       try {
@@ -211,15 +261,73 @@ export default function SelectSchoolPage() {
         )}
       </div>
 
-      {/* ✅ Branded Footer */}
+      {/* ✅ Branded Footer with Hidden Trigger */}
       <footer className="w-full flex justify-center items-center fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 px-3 z-50">
-        <div className="bg-white/10 border border-white/10 backdrop-blur-lg px-5 py-2 rounded-full shadow-md text-gray-300 text-[10px] sm:text-xs flex items-center gap-1">
+        <div className="bg-white/10 border border-white/10 backdrop-blur-lg px-5 py-2 rounded-full shadow-md text-gray-300 text-[10px] sm:text-xs flex items-center gap-1 select-none">
           <span>Powered by</span>
-          <span className="text-blue-400 font-semibold">
+          <span
+            className="text-blue-400 font-semibold cursor-pointer hover:text-blue-300 transition"
+            // Desktop: triple-click
+            onClick={handleTripleClick}
+            // Mobile: long-press
+            onPointerDown={onTechPointerDown}
+            onPointerUp={onTechPointerUp}
+            onPointerCancel={onTechPointerUp}
+            onPointerLeave={onTechPointerUp}
+            title="AxWEB"
+            aria-label="AxWEB"
+          >
             AxWEB Technologies
           </span>
         </div>
       </footer>
+
+      {/* 🔐 Super Access Modal */}
+      {showSuperModal && (
+        <div className="fixed inset-0 z-[999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111427]/95 p-6 text-white shadow-2xl"
+          >
+            <div className="mb-3">
+              <h3 className="text-lg font-semibold">System Access Verification</h3>
+              <p className="text-xs text-white/60 mt-1">
+                Authorized personnel only. Enter access key to continue.
+              </p>
+            </div>
+
+            <input
+              type="password"
+              placeholder="Enter access key..."
+              value={superKey}
+              onChange={(e) => setSuperKey(e.target.value)}
+              className="w-full px-3 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 outline-none"
+              autoFocus
+            />
+
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => {
+                  setShowSuperModal(false);
+                  setSuperKey("");
+                }}
+                className="px-3 py-2 text-xs rounded-lg border border-white/10 hover:bg-white/10 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={verifySuperKey}
+                disabled={verifying || !superKey.trim()}
+                className="px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 disabled:opacity-50"
+              >
+                {verifying ? "Verifying..." : "Verify Access"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
     </div>
   );
 }
