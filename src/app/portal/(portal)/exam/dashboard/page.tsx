@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   Timer,
   ListChecks,
+  Menu,
+  X,
 } from "lucide-react";
 
 /* ---------------- Types ---------------- */
@@ -30,6 +32,7 @@ type UserSession = {
 /* --------------- Page --------------- */
 export default function ExamDashboardPage() {
   const [session, setSession] = useState<UserSession | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("acadexUser");
@@ -42,9 +45,7 @@ export default function ExamDashboardPage() {
       const parsed = JSON.parse(raw);
       setSession(parsed);
 
-      // Role gate — only Exam Admins
       if (!parsed?.token || parsed?.role !== "examAdmin") {
-        // If logged as another admin, route them to their dashboard
         switch (parsed?.role) {
           case "mainAdmin":
             window.location.href = "/portal/admin/dashboard";
@@ -64,7 +65,6 @@ export default function ExamDashboardPage() {
     }
   }, []);
 
-  // Skeleton while verifying session
   if (!session)
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#0c0c14] to-[#0f1620] text-white p-8">
@@ -75,67 +75,48 @@ export default function ExamDashboardPage() {
 
   const school = session.school ?? { name: "Your School", subdomain: "" };
 
-  /* ----------- Dummy stats for now (replace with API later) ----------- */
   const stats = [
-    {
-      label: "Pending Exams",
-      value: 3,
-      icon: Timer,
-      gradient: "from-amber-500 to-orange-600",
-    },
-    {
-      label: "Approved Exams",
-      value: 8,
-      icon: ShieldCheck,
-      gradient: "from-emerald-500 to-teal-500",
-    },
-    {
-      label: "Live Exams",
-      value: 2,
-      icon: LayoutGrid,
-      gradient: "from-blue-500 to-indigo-600",
-    },
-    {
-      label: "Submitted Papers",
-      value: 120,
-      icon: ListChecks,
-      gradient: "from-fuchsia-500 to-violet-600",
-    },
+    { label: "Pending Exams", value: 3, icon: Timer, gradient: "from-amber-500 to-orange-600" },
+    { label: "Approved Exams", value: 8, icon: ShieldCheck, gradient: "from-emerald-500 to-teal-500" },
+    { label: "Live Exams", value: 2, icon: LayoutGrid, gradient: "from-blue-500 to-indigo-600" },
+    { label: "Submitted Papers", value: 120, icon: ListChecks, gradient: "from-fuchsia-500 to-violet-600" },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#0c0c14] to-[#0f1620] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#0c0c14] to-[#0f1620] text-white flex">
       {/* Background glows */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-blue-700/20 blur-3xl" />
         <div className="absolute bottom-10 right-6 h-96 w-96 rounded-full bg-indigo-700/20 blur-3xl" />
       </div>
 
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-white/[0.03] backdrop-blur-xl">
-       <div className="px-5 py-4 flex items-center gap-3 border-b border-white/10">
-                   <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white/10 grid place-items-center">
-                     {school.logo ? (
-                       <Image
-                         src={school.logo}
-                         alt={school.name}
-                         width={40}
-                         height={40}
-                         className="object-contain"
-                       />
-                     ) : (
-                       <School className="opacity-80" size={18} />
-                     )}
-                   </div>
-                   <div>
-                     <p className="text-sm font-semibold leading-tight">{school.name}</p>
-                     <p className="text-[11px] text-white/50">
-                       {school.subdomain}.acadex.com
-                     </p>
-                   </div>
-                 </div>
-       
-
+      {/* Sidebar (hidden on mobile) */}
+      <aside
+        className={`fixed z-40 top-0 left-0 h-full w-64 border-r border-white/10 bg-white/[0.03] backdrop-blur-xl transition-transform duration-300 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <div className="px-5 py-4 flex items-center justify-between border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white/10 grid place-items-center">
+              {school.logo ? (
+                <Image src={school.logo} alt={school.name} width={40} height={40} className="object-contain" />
+              ) : (
+                <School className="opacity-80" size={18} />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-semibold leading-tight">{school.name}</p>
+              <p className="text-[11px] text-white/50">{school.subdomain}.acadex.com</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="md:hidden text-white/60 hover:text-white transition"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
         <nav className="px-3 py-4 space-y-1 text-sm">
           <SidebarItem href="/portal/exam/dashboard" icon={LayoutGrid} active>
@@ -170,7 +151,6 @@ export default function ExamDashboardPage() {
           </SidebarItem>
         </nav>
 
-        {/* Role badge */}
         <div className="absolute bottom-4 left-4 right-4">
           <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs">
             <p className="text-white/60">Signed in as</p>
@@ -180,14 +160,34 @@ export default function ExamDashboardPage() {
       </aside>
 
       {/* Main */}
-      <main className="ml-64 p-6">
+      <main className="flex-1 md:ml-64 p-6 w-full">
+        {/* Top bar for mobile */}
+        <div className="flex items-center justify-between mb-4 md:hidden">
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="p-2 bg-white/10 rounded-lg border border-white/10 text-white/70 hover:text-white"
+          >
+            <Menu size={20} />
+          </button>
+          <h1 className="text-lg font-semibold">{school.name}</h1>
+          <div className="h-8 w-8 rounded-full bg-white/10 grid place-items-center border border-white/10">
+            <Image
+              src={school.logo || "/acadex-logo.png"}
+              alt="Logo"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+          </div>
+        </div>
+
         {/* Header */}
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-6 shadow-2xl"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="text-white/70 text-sm">Role: Exam Officer</p>
               <h2 className="mt-1 text-2xl font-semibold tracking-tight">
@@ -197,7 +197,7 @@ export default function ExamDashboardPage() {
                 Prepare, manage, and review your institution’s examinations with ease.
               </p>
             </div>
-            <div className="relative h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 grid place-items-center shadow-lg shadow-blue-600/20">
+            <div className="relative h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 grid place-items-center shadow-lg shadow-blue-600/20 self-center">
               <ShieldCheck className="size-6" />
               <motion.span
                 animate={{ scale: [1, 1.25, 1] }}
@@ -213,7 +213,7 @@ export default function ExamDashboardPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 mt-6"
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6"
         >
           {stats.map((s, i) => (
             <StatCard key={i} label={s.label} value={s.value} Icon={s.icon} gradient={s.gradient} />
@@ -225,7 +225,7 @@ export default function ExamDashboardPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4 mt-6"
+          className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mt-6"
         >
           <ActionCard
             href="/portal/exam/create"
@@ -257,22 +257,19 @@ export default function ExamDashboardPage() {
           />
         </motion.section>
 
-        {/* Insights Placeholder */}
+        {/* Insights */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="mt-6 grid gap-4 lg:grid-cols-3"
+          className="mt-6 grid gap-4 md:grid-cols-3"
         >
-          <div className="lg:col-span-2 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+          <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-semibold flex items-center gap-2">
                 <BarChart3 className="size-4 opacity-80" /> Upcoming Exams
               </h3>
-              <Link
-                href="/portal/exam/manage"
-                className="text-xs text-blue-300 hover:text-blue-200"
-              >
+              <Link href="/portal/exam/manage" className="text-xs text-blue-300 hover:text-blue-200">
                 View all →
               </Link>
             </div>
@@ -284,16 +281,13 @@ export default function ExamDashboardPage() {
               ].map((x, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex items-center justify-between"
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
                 >
                   <div>
                     <p className="text-sm font-medium">{x.title}</p>
                     <p className="text-xs text-white/60">{x.meta}</p>
                   </div>
-                  <Link
-                    href="/portal/exam/manage"
-                    className="text-xs text-blue-300 hover:text-blue-200"
-                  >
+                  <Link href="/portal/exam/manage" className="text-xs text-blue-300 hover:text-blue-200">
                     Manage
                   </Link>
                 </div>
@@ -321,7 +315,6 @@ export default function ExamDashboardPage() {
 }
 
 /* ---------------- Components ---------------- */
-
 function SidebarItem({
   href,
   icon: Icon,
@@ -366,17 +359,23 @@ function StatCard({
     <motion.div
       whileHover={{ y: -3, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg hover:shadow-blue-500/10"
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg"
     >
-      <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`} />
+      <div
+        className={`absolute -right-6 -top-6 h-24 w-24 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`}
+      />
       <div className="flex items-center justify-between">
         <div>
-          <p className={`text-xs uppercase tracking-wider bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}>
+          <p
+            className={`text-xs uppercase tracking-wider bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}
+          >
             {label}
           </p>
           <p className="mt-1 text-3xl font-bold">{value}</p>
         </div>
-        <div className={`h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg`}>
+        <div
+          className={`h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white`}
+        >
           <Icon className="size-5" />
         </div>
       </div>
@@ -402,15 +401,21 @@ function ActionCard({
       <motion.div
         whileHover={{ y: -3, scale: 1.01 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg h-[130px]"
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg h-[130px]"
       >
-        <div className={`absolute -right-8 -top-10 h-28 w-28 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`} />
+        <div
+          className={`absolute -right-8 -top-10 h-28 w-28 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`}
+        />
         <div className="flex items-start gap-3">
-          <div className={`mt-0.5 h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg`}>
+          <div
+            className={`h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white`}
+          >
             <Icon className="size-5" />
           </div>
           <div>
-            <h4 className={`text-base font-semibold bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}>
+            <h4
+              className={`text-base font-semibold bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}
+            >
               {title}
             </h4>
             <p className="mt-1 text-sm text-white/70">{description}</p>
