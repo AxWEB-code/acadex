@@ -17,6 +17,8 @@ import {
   Table,
   CheckCircle2,
   Clock,
+  Menu,
+  X,
 } from "lucide-react";
 
 /* ---------------- Types ---------------- */
@@ -30,6 +32,7 @@ type UserSession = {
 /* --------------- Page --------------- */
 export default function ResultDashboardPage() {
   const [session, setSession] = useState<UserSession | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("acadexUser");
@@ -42,7 +45,6 @@ export default function ResultDashboardPage() {
       const parsed = JSON.parse(raw);
       setSession(parsed);
 
-      // Role gate — only Result Officers
       if (!parsed?.token || parsed?.role !== "resultAdmin") {
         switch (parsed?.role) {
           case "mainAdmin":
@@ -81,35 +83,61 @@ export default function ResultDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#0c0c14] to-[#0f1620] text-white">
+    <div className="min-h-screen flex bg-gradient-to-b from-[#0a0a0f] via-[#0c0c14] to-[#0f1620] text-white overflow-hidden">
       {/* Background glow */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-blue-700/20 blur-3xl" />
         <div className="absolute bottom-10 right-6 h-96 w-96 rounded-full bg-indigo-700/20 blur-3xl" />
       </div>
 
+      {/* Overlay for mobile menu */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm md:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-white/[0.03] backdrop-blur-xl flex flex-col justify-between">
+      <aside
+        className={`fixed top-0 left-0 z-40 h-full w-64 border-r border-white/10 bg-white/[0.05] backdrop-blur-2xl flex flex-col justify-between transition-transform duration-300 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
         <div>
-          {/* Sidebar Header — same style as Admission Officer */}
-          <div className="flex items-center gap-3 px-5 py-5 mb-2 border-b border-white/10">
-            <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center">
-              {school.logo ? (
-                <Image src={school.logo} alt={school.name} width={40} height={40} className="object-contain" />
-              ) : (
-                <School size={18} className="opacity-70" />
-              )}
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between px-5 py-5 mb-2 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white/10 grid place-items-center">
+                {school.logo ? (
+                  <Image
+                    src={school.logo}
+                    alt={school.name}
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                  />
+                ) : (
+                  <School size={18} className="opacity-70" />
+                )}
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold leading-tight">{school.name}</h2>
+                <p className="text-[11px] text-blue-400/70 tracking-wide">
+                  {school.subdomain}.acadex.com
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <h2 className="text-sm font-semibold leading-tight">{school.name}</h2>
-              <p className="text-[11px] text-blue-400/70 tracking-wide">
-                {school.subdomain}.acadex.com
-              </p>
-            </div>
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="md:hidden text-white/60 hover:text-white transition"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {/* Navigation */}
-          <nav className="px-3 py-4 space-y-1 text-sm">
+          <nav className="px-3 py-4 space-y-1 text-sm overflow-y-auto">
             <SidebarItem href="/portal/result/dashboard" icon={BarChart3} active>
               Overview
             </SidebarItem>
@@ -152,12 +180,32 @@ export default function ResultDashboardPage() {
       </aside>
 
       {/* Main */}
-      <main className="ml-64 p-6 space-y-6">
+      <main className="flex-1 md:ml-64 p-6 space-y-6 overflow-x-hidden">
+        {/* Mobile topbar */}
+        <div className="flex items-center justify-between mb-4 md:hidden">
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="p-2 bg-white/10 rounded-lg border border-white/10 text-white/70 hover:text-white"
+          >
+            <Menu size={20} />
+          </button>
+          <h1 className="text-base font-semibold">{school.name}</h1>
+          <div className="h-8 w-8 rounded-full bg-white/10 grid place-items-center border border-white/10">
+            <Image
+              src={school.logo || "/acadex-logo.png"}
+              alt="Logo"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+          </div>
+        </div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-6 shadow-2xl flex items-center justify-between"
+          className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-6 shadow-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
         >
           <div>
             <h1 className="text-2xl font-semibold">Result Overview</h1>
@@ -165,14 +213,14 @@ export default function ResultDashboardPage() {
               Manage uploaded results, reviews, and performance analytics.
             </p>
           </div>
-          <Table className="text-blue-400/70" size={22} />
+          <Table className="text-blue-400/70 self-center" size={22} />
         </motion.div>
 
         {/* Stats */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
           {stats.map((s, i) => (
             <StatCard key={i} label={s.label} value={s.value} Icon={s.icon} gradient={s.gradient} />
@@ -184,7 +232,7 @@ export default function ResultDashboardPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4"
+          className="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
         >
           <ActionCard
             href="/portal/result/upload"
@@ -221,7 +269,7 @@ export default function ResultDashboardPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-6"
+          className="rounded-2xl border border-white/10 bg-white/[0.04] p-6"
         >
           <h3 className="text-lg font-semibold mb-4">Recent Uploads</h3>
           <div className="space-y-3 text-sm">
@@ -232,7 +280,7 @@ export default function ResultDashboardPage() {
             ].map((r, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between border border-white/10 bg-white/[0.03] rounded-xl px-4 py-3"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-white/10 bg-white/[0.03] rounded-xl px-4 py-3 gap-2"
               >
                 <div>
                   <p className="font-medium text-white">{r.course}</p>
@@ -264,7 +312,6 @@ export default function ResultDashboardPage() {
 }
 
 /* ---------------- Components ---------------- */
-
 function SidebarItem({
   href,
   icon: Icon,
@@ -292,20 +339,34 @@ function SidebarItem({
   );
 }
 
-function StatCard({ label, value, Icon, gradient }: any) {
+function StatCard({
+  label,
+  value,
+  Icon,
+  gradient,
+}: {
+  label: string;
+  value: number | string;
+  Icon: React.ElementType;
+  gradient: string;
+}) {
   return (
     <motion.div
       whileHover={{ y: -3, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg"
     >
-      <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`} />
+      <div
+        className={`absolute -right-6 -top-6 h-24 w-24 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`}
+      />
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase text-white/60">{label}</p>
           <h3 className="text-2xl font-bold mt-1">{value}</h3>
         </div>
-        <div className={`h-9 w-9 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white`}>
+        <div
+          className={`h-9 w-9 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white`}
+        >
           <Icon className="size-4" />
         </div>
       </div>
@@ -313,7 +374,19 @@ function StatCard({ label, value, Icon, gradient }: any) {
   );
 }
 
-function ActionCard({ href, title, description, gradient, Icon }: any) {
+function ActionCard({
+  href,
+  title,
+  description,
+  gradient,
+  Icon,
+}: {
+  href: string;
+  title: string;
+  description: string;
+  gradient: string;
+  Icon: React.ElementType;
+}) {
   return (
     <Link href={href}>
       <motion.div
@@ -321,13 +394,19 @@ function ActionCard({ href, title, description, gradient, Icon }: any) {
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
         className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-lg h-[130px]"
       >
-        <div className={`absolute -right-8 -top-10 h-28 w-28 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`} />
+        <div
+          className={`absolute -right-8 -top-10 h-28 w-28 rounded-2xl bg-gradient-to-br ${gradient} opacity-20 blur-xl`}
+        />
         <div className="flex items-start gap-3">
-          <div className={`h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white`}>
+          <div
+            className={`h-10 w-10 grid place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white`}
+          >
             <Icon className="size-5" />
           </div>
           <div>
-            <h4 className={`text-base font-semibold bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}>
+            <h4
+              className={`text-base font-semibold bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}
+            >
               {title}
             </h4>
             <p className="mt-1 text-sm text-white/70">{description}</p>
