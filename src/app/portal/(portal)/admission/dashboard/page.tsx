@@ -14,10 +14,12 @@ import {
   Clock,
   XCircle,
   UserPlus,
+  School,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+/* ------------------ Component ------------------ */
 export default function AdmissionDashboard() {
   const [school, setSchool] = useState<any>(null);
 
@@ -42,44 +44,68 @@ export default function AdmissionDashboard() {
   }, []);
 
   if (!school)
-    return <div className="text-white/70 p-8">Loading Admission Dashboard...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white/70">
+        Loading Admission Dashboard...
+      </div>
+    );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#0b0f1f] via-[#0e1428] to-[#070b14] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#0c0c14] to-[#0f1620] text-white flex">
       {/* === Sidebar === */}
-      <aside className="fixed top-0 left-0 h-full w-64 backdrop-blur-xl bg-white/[0.03] border-r border-white/10 p-6 flex flex-col justify-between">
+      <aside className="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-white/[0.03] backdrop-blur-xl flex flex-col justify-between">
+        {/* School Info */}
         <div>
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20">
-              <Image
-                src={school.logo}
-                alt={school.name}
-                width={40}
-                height={40}
-                className="object-contain"
-              />
+          <div className="px-5 py-4 flex items-center gap-3 border-b border-white/10">
+            <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white/10 grid place-items-center">
+              {school.logo ? (
+                <Image
+                  src={school.logo}
+                  alt={school.name}
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+              ) : (
+                <School className="opacity-80" size={18} />
+              )}
             </div>
             <div>
-              <h2 className="text-sm font-semibold">{school.name}</h2>
-              <p className="text-xs text-blue-400/70">
+              <p className="text-sm font-semibold leading-tight">{school.name}</p>
+              <p className="text-[11px] text-white/50">
                 {school.subdomain}.acadex.com
               </p>
             </div>
           </div>
 
-          <nav className="space-y-2 text-sm">
-            <NavLink href="#" icon={<Home size={16} />} label="Overview" />
-            <NavLink href="#" icon={<Users size={16} />} label="Applicants" />
-            <NavLink href="#" icon={<BarChart3 size={16} />} label="Reports" />
-            <NavLink href="#" icon={<Settings size={16} />} label="Settings" />
+          {/* Navigation */}
+          <nav className="px-3 py-4 space-y-1 text-sm">
+            <SidebarItem href="#" icon={Home} active>
+              Overview
+            </SidebarItem>
+            <SidebarItem href="#" icon={Users}>
+              Applicants
+            </SidebarItem>
+            <SidebarItem href="#" icon={BarChart3}>
+              Reports
+            </SidebarItem>
+            <SidebarItem href="#" icon={Settings}>
+              Settings
+            </SidebarItem>
           </nav>
         </div>
 
-        <div className="space-y-3">
+        {/* Footer */}
+        <div className="p-4">
+          <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs mb-3">
+            <p className="text-white/60">Signed in as</p>
+            <p className="mt-1 font-semibold text-blue-300">Admission Officer</p>
+          </div>
+
           <button className="w-full flex items-center gap-2 text-sm text-white/60 hover:text-red-400 transition">
             <LogOut size={16} /> Logout
           </button>
-          <p className="text-xs text-white/30 text-center">
+          <p className="text-xs text-white/30 text-center mt-2">
             © 2025 AcadeX Admission
           </p>
         </div>
@@ -93,19 +119,25 @@ export default function AdmissionDashboard() {
           <div className="absolute bottom-10 left-10 h-72 w-72 rounded-full bg-indigo-600/10 blur-3xl" />
         </div>
 
-        {/* Top Bar */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-semibold">Admission Overview</h1>
-            <p className="text-sm text-white/60">
-              Manage applicants and admission approvals for {school.stats.session}.
-            </p>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d1222] via-[#0f1430] to-[#0a0f1f] p-6 shadow-2xl"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Admission Overview</h1>
+              <p className="text-sm text-white/60">
+                Manage applicants and approvals for {school.stats.session}.
+              </p>
+            </div>
+            <button className="relative text-white/70 hover:text-white transition">
+              <Bell size={20} />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 rounded-full" />
+            </button>
           </div>
-          <button className="relative text-white/70 hover:text-white transition">
-            <Bell size={20} />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 rounded-full" />
-          </button>
-        </div>
+        </motion.div>
 
         {/* Quick Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -177,7 +209,7 @@ export default function AdmissionDashboard() {
           >
             <h3 className="text-lg font-semibold mb-3">Recent Activities</h3>
             <ul className="space-y-3 text-sm text-white/70">
-              {school.activities.map((a, i) => (
+              {school.activities.map((a: any, i: number) => (
                 <li key={i} className="flex items-center gap-2">
                   {a.type === "approved" && (
                     <CheckCircle2 className="text-green-400" size={14} />
@@ -205,23 +237,30 @@ export default function AdmissionDashboard() {
   );
 }
 
-/* === Components === */
-function NavLink({
+/* === Reusable Components === */
+
+function SidebarItem({
   href,
-  icon,
-  label,
+  icon: Icon,
+  children,
+  active,
 }: {
   href: string;
-  icon: React.ReactNode;
-  label: string;
+  icon: React.ElementType;
+  children: React.ReactNode;
+  active?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition"
+      className={`flex items-center gap-3 rounded-xl px-3 py-2 transition ${
+        active
+          ? "bg-white/10 text-white"
+          : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+      }`}
     >
-      {icon}
-      <span>{label}</span>
+      <Icon className="size-4 opacity-90" />
+      <span>{children}</span>
     </Link>
   );
 }

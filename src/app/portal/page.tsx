@@ -17,7 +17,6 @@ import Link from "next/link";
 import { fetchJSON } from "@/lib/api";
 import { API_BASE } from "@/lib/config";
 
-
 // Define proper types to replace 'any'
 interface School {
   id: number;
@@ -70,7 +69,7 @@ export default function PortalLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [shake, setShake] = useState(false);
-
+  const [isSupervisor, setIsSupervisor] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -87,6 +86,7 @@ export default function PortalLoginPage() {
     academicYear: "",
     contactNumber: "",
     role: "",
+    token: "",
   });
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
@@ -96,15 +96,18 @@ export default function PortalLoginPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem("selectedSchool");
-    if (stored) {
-      const s = JSON.parse(stored);
-      setSchool(s);
-      if (s.schoolType === "TERTIARY") {
-        loadDepartments(s.id);
-      }
-    } else {
-      window.location.href = "/select-school";
-    }
+if (stored) {
+  const s = JSON.parse(stored);
+  // ✅ Normalize subdomain to lowercase, fix mismatch
+  s.subdomain = s.subdomain.toLowerCase().replace("acadexuniversity", "adxuni");
+  setSchool(s);
+  if (s.schoolType === "TERTIARY") {
+    loadDepartments(s.id);
+  }
+} else {
+  window.location.href = "/select-school";
+}
+
   }, []);
 
   // Show school code modal when registration is clicked
@@ -397,6 +400,7 @@ if (res.student) {
           academicYear: "",
           contactNumber: "",
           role: "",
+          token: "",
         });
         setIsRegister(false);
         setStep(1);
@@ -611,34 +615,54 @@ if (res.student) {
         className="bg-[#181b2c]/90 backdrop-blur-md rounded-2xl p-8 w-full max-w-sm border border-white/10 shadow-lg"
       >
         {/* Toggle Tabs */}
-        {!isRegister && !isForgot && (
-          <div className="flex justify-center gap-6 mb-6">
-            <button
-              onClick={() => setIsAdmin(false)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
-                !isAdmin
-                  ? "bg-white/5 border border-blue-500/50 text-blue-300"
-                  : "text-gray-400"
-              }`}
-            >
-              <GraduationCap size={16} /> Student
-            </button>
-            <button
-              onClick={() => setIsAdmin(true)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
-                isAdmin
-                  ? "bg-white/5 border border-blue-500/50 text-blue-300"
-                  : "text-gray-400"
-              }`}
-            >
-              <ShieldCheck size={16} /> Admin
-            </button>
-          </div>
-        )}
+{!isRegister && !isForgot && (
+  <div className="flex justify-center gap-4 mb-6">
+    <button
+      onClick={() => {
+        setIsAdmin(false);
+        setIsSupervisor(false);
+      }}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+        !isAdmin && !isSupervisor
+          ? "bg-white/5 border border-blue-500/50 text-blue-300"
+          : "text-gray-400"
+      }`}
+    >
+      <GraduationCap size={16} /> Student
+    </button>
+    <button
+      onClick={() => {
+        setIsAdmin(true);
+        setIsSupervisor(false);
+      }}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+        isAdmin
+          ? "bg-white/5 border border-blue-500/50 text-blue-300"
+          : "text-gray-400"
+      }`}
+    >
+      <ShieldCheck size={16} /> Admin
+    </button>
+    <button
+      onClick={() => {
+        setIsSupervisor(true);
+        setIsAdmin(false);
+      }}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+        isSupervisor
+          ? "bg-white/5 border border-blue-500/50 text-blue-300"
+          : "text-gray-400"
+      }`}
+    >
+      <LogIn size={16} /> Supervisor
+    </button>
+  </div>
+)}
+
 
         <AnimatePresence mode="wait">
           {/* LOGIN */}
-          {!isRegister && !isForgot && (
+          {!isRegister && !isForgot && !isSupervisor && (
             <motion.form
               key="login"
               onSubmit={handleLogin}
@@ -721,6 +745,77 @@ if (res.student) {
                   </span>
                 </p>
               )}
+            </motion.form>
+          )}
+
+          {/* SUPERVISOR LOGIN */}
+          {isSupervisor && (
+            <motion.form
+              key="supervisor"
+              onSubmit={async (e) => {
+                e.preventDefault();
+
+                if (!form.token) {
+                  setToast({ msg: "Enter your supervisor token.", type: "error" });
+                  setTimeout(() => setToast(null), 3000);
+                  return;
+                }
+
+                setLoading(true);
+                try {
+                  const res = await fetch(`${API_BASE}/api/supervisor/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      token: form.token,
+                      schoolSubdomain: school?.subdomain,
+                    }),
+                  });
+
+                  const data = await res.json();
+                  if (res.ok && data.token) {
+                    setToast({ msg: "✅ Supervisor access granted!", type: "success" });
+                    localStorage.setItem("acadexUser", JSON.stringify({ ...data, role: "supervisor" }));
+                    setTimeout(() => (window.location.href = "/portal/supervisor/dashboard"), 1000);
+                  } else {
+                    setToast({
+                      msg: data.error || "Invalid or expired token.",
+                      type: "error",
+                    });
+                    setTimeout(() => setToast(null), 3000);
+                  }
+                } catch {
+                  setToast({
+                    msg: "Server unreachable. Try again.",
+                    type: "error",
+                  });
+                  setTimeout(() => setToast(null), 3000);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-4"
+            >
+              <input
+                type="text"
+                name="token"
+                placeholder="Enter Supervisor Access Token"
+                value={form.token || ""}
+                onChange={(e) => setForm({ ...form, token: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-blue-500 font-mono tracking-wide"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-2 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition-all"
+              >
+                <ShieldCheck size={16} />
+                {loading ? "Verifying..." : "Login with Token"}
+              </button>
             </motion.form>
           )}
 
