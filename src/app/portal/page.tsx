@@ -614,15 +614,15 @@ if (res.student) {
         transition={{ duration: 0.5 }}
         className="bg-[#181b2c]/90 backdrop-blur-md rounded-2xl p-8 w-full max-w-sm border border-white/10 shadow-lg"
       >
-        {/* Toggle Tabs */}
+{/* Toggle Tabs */}
 {!isRegister && !isForgot && (
-  <div className="flex justify-center gap-4 mb-6">
+  <div className="flex justify-center gap-2 mb-6">
     <button
       onClick={() => {
         setIsAdmin(false);
         setIsSupervisor(false);
       }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm ${
         !isAdmin && !isSupervisor
           ? "bg-white/5 border border-blue-500/50 text-blue-300"
           : "text-gray-400"
@@ -635,7 +635,7 @@ if (res.student) {
         setIsAdmin(true);
         setIsSupervisor(false);
       }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm ${
         isAdmin
           ? "bg-white/5 border border-blue-500/50 text-blue-300"
           : "text-gray-400"
@@ -648,7 +648,7 @@ if (res.student) {
         setIsSupervisor(true);
         setIsAdmin(false);
       }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm ${
         isSupervisor
           ? "bg-white/5 border border-blue-500/50 text-blue-300"
           : "text-gray-400"
@@ -658,7 +658,6 @@ if (res.student) {
     </button>
   </div>
 )}
-
 
         <AnimatePresence mode="wait">
           {/* LOGIN */}
