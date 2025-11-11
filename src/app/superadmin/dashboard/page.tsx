@@ -69,40 +69,49 @@ export default function SuperAdminDashboard() {
   }
 
   /* ---------- Mock Data ---------- */
-  const statCards = [
-    { 
-      label: "Total Schools", 
-      value: 12, 
-      icon: Building2, 
-      gradient: "from-blue-500 to-cyan-600",
-      trend: "+4.8%",
-      trendType: "positive"
-    },
-    { 
-      label: "Total Students", 
-      value: 5420, 
-      icon: Users, 
-      gradient: "from-purple-500 to-fuchsia-600",
-      trend: "+12.3%",
-      trendType: "positive"
-    },
-    { 
-      label: "Total Admins", 
-      value: 73, 
-      icon: GraduationCap, 
-      gradient: "from-emerald-500 to-teal-600",
-      trend: "+2.1%",
-      trendType: "positive"
-    },
-    { 
-      label: "Active Exams", 
-      value: 18, 
-      icon: BarChart3, 
-      gradient: "from-amber-400 to-orange-500",
-      trend: "-1.2%",
-      trendType: "negative"
-    },
-  ];
+type StatCardType = {
+  label: string;
+  value: number;
+  icon: React.ElementType;
+  gradient: string;
+  trend?: string;
+  trendType?: "positive" | "negative";
+};
+
+const statCards: StatCardType[] = [
+  { 
+    label: "Total Schools", 
+    value: 12, 
+    icon: Building2, 
+    gradient: "from-blue-500 to-cyan-600",
+    trend: "+4.8%",
+    trendType: "positive"
+  },
+  { 
+    label: "Total Students", 
+    value: 5420, 
+    icon: Users, 
+    gradient: "from-purple-500 to-fuchsia-600",
+    trend: "+12.3%",
+    trendType: "positive"
+  },
+  { 
+    label: "Total Admins", 
+    value: 73, 
+    icon: GraduationCap, 
+    gradient: "from-emerald-500 to-teal-600",
+    trend: "+2.1%",
+    trendType: "positive"
+  },
+  { 
+    label: "Active Exams", 
+    value: 18, 
+    icon: BarChart3, 
+    gradient: "from-amber-400 to-orange-500",
+    trend: "-1.2%",
+    trendType: "negative"
+  },
+];
 
   const quickActions = [
     { title: "Add School", icon: Building2 },
