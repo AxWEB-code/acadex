@@ -64,12 +64,9 @@ function cn(...classes: (string | undefined | null | false)[]): string {
 
 type SortConfig = { column: string; direction: "asc" | "desc" } | null;
 
-export default function SchoolDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = React.use(params);
+export default function SchoolDetailsPage({ params }: { params: { id: string } }) {
+  const { id } = params;
+
 
 
 
