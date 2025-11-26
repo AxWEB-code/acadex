@@ -2,18 +2,25 @@ export const API_BASE =
   (process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, "") ||
     "https://acadex-backend-qrds.onrender.com");
 
-export async function fetchJSON(path: string, options?: RequestInit) {
+export async function fetchJSON(path: string, options: any = {}) {
   const safePath = path.startsWith("/") ? path : `/${path}`;
   const url = `${API_BASE}${safePath}`;
 
-  console.log("🌍 Fetching:", url); // 🧠 Helps us see the actual URL being called
+  console.log("🌍 Fetching:", url);
+
+  // Prepare headers - don't set Content-Type for FormData
+  const headers: any = {};
+
+  if (!options.isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   try {
     const res = await fetch(url, {
       cache: "no-store",
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...headers,
         ...options?.headers,
       },
     });

@@ -23,6 +23,7 @@ import {
   Cloud,
   Globe2,
   ChevronDown,
+  BookOpen
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -45,6 +46,7 @@ import {
   RadialBarChart,
   RadialBar,
   Legend,
+
 } from "recharts";
 
 export default function SuperAdminDashboard() {
@@ -240,6 +242,7 @@ const statCards: StatCardType[] = [
               <NavItem href="/superadmin/schools" icon={Building2}>
                 Schools
               </NavItem>
+              <NavItem href="/superadmin/exams" icon={BookOpen}>Exams</NavItem>
               <NavItem href="/superadmin/admins" icon={Users}>
                 Admin Accounts
               </NavItem>
