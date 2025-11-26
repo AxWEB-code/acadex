@@ -533,7 +533,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
         </aside>
 
         {/* Main */}
-        <main className="flex-1 md:ml-64 p-6 space-y-8">
+        <main className="flex-1 md:ml-64 p-4 sm:p-6 space-y-8 max-w-full overflow-x-hidden">
           {/* Mobile topbar */}
           <div className="flex items-center justify-between md:hidden mb-4">
             <button
@@ -580,7 +580,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
     </div>
   </div>
 
-  <div className="flex items-center gap-2">
+  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
     <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20">
       Active
     </Badge>
@@ -626,7 +626,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
             {/* Tabs row + search + filters */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <TabsList className="bg-white/[0.05] border border-white/10">
+                <TabsList className="bg-white/[0.05] border border-white/10 overflow-x-auto whitespace-nowrap flex">
                   <TabsTrigger value="students">Students</TabsTrigger>
                   <TabsTrigger value="exams">Exams</TabsTrigger>
                   <TabsTrigger value="results">Results</TabsTrigger>
@@ -634,7 +634,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
 
-                <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 w-full sm:w-72">
+                <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 w-full sm:w-72 min-w-0 flex-1">
                   <Search size={16} className="text-white/40" />
                   <Input
                     value={q}
@@ -791,7 +791,8 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                   Showing {studentsPageRows.length} of {studentsFiltered.length}{" "}
                   students
                 </DataNote>
-                <Table className="text-sm">
+                <div className="w-full overflow-x-auto">
+  <Table className="text-sm min-w-[900px]">
                   <TableHeader>
                     <TableRow>
                       <SortableHead
@@ -894,6 +895,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                     ))}
                   </TableBody>
                 </Table>
+                </div>
                 <PaginationBar
                   page={studentsPage}
                   totalPages={studentsTotalPages}
@@ -903,12 +905,14 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
             </TabsContent>
 
             {/* Exams Table */}
-            <TabsContent value="exams" className="mt-4">
-              <GlassCard>
-                <DataNote>
-                  Showing {examsPageRows.length} of {examsFiltered.length} exams
-                </DataNote>
-                <Table className="text-sm">
+           <TabsContent value="exams" className="mt-4">
+  <GlassCard>
+    <DataNote>
+      Showing {examsPageRows.length} of {examsFiltered.length} exams
+    </DataNote>
+
+    <div className="w-full overflow-x-auto">
+      <Table className="text-sm min-w-[900px]">
                   <TableHeader>
                     <TableRow>
                       <SortableHead
@@ -991,13 +995,15 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                     ))}
                   </TableBody>
                 </Table>
-                <PaginationBar
-                  page={examsPage}
-                  totalPages={examsTotalPages}
-                  onPageChange={(p) => setPage("exams", p)}
-                />
-              </GlassCard>
-            </TabsContent>
+    </div>
+
+    <PaginationBar
+      page={examsPage}
+      totalPages={examsTotalPages}
+      onPageChange={(p) => setPage("exams", p)}
+    />
+  </GlassCard>
+</TabsContent>
 
             {/* Results Table */}
             <TabsContent value="results" className="mt-4">
@@ -1006,7 +1012,9 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                   Showing {resultsPageRows.length} of {resultsFiltered.length}{" "}
                   results
                 </DataNote>
-                <Table className="text-sm">
+                <div className="w-full overflow-x-auto">
+  <Table className="text-sm min-w-[900px]">
+
                   <TableHeader>
                     <TableRow>
                       <SortableHead
@@ -1085,6 +1093,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                     ))}
                   </TableBody>
                 </Table>
+                </div>
                 <PaginationBar
                   page={resultsPage}
                   totalPages={resultsTotalPages}
@@ -1100,7 +1109,9 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                   Showing {adminsPageRows.length} of {adminsFiltered.length}{" "}
                   admins
                 </DataNote>
-                <Table className="text-sm">
+                <div className="w-full overflow-x-auto">
+  <Table className="text-sm min-w-[900px]">
+
                   <TableHeader>
                     <TableRow>
                       <SortableHead
@@ -1162,6 +1173,7 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
                     ))}
                   </TableBody>
                 </Table>
+                </div>
                 <PaginationBar
                   page={adminsPage}
                   totalPages={adminsTotalPages}
