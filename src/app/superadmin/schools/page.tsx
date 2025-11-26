@@ -28,10 +28,24 @@ import Image from "next/image";
 import { fetchJSON } from "@/lib/api";
 import { usePathname } from "next/navigation";
 
+
+type SchoolItem = {
+  id: number;
+  name: string;
+  schoolCode: string;
+  subdomain?: string;
+  logo?: string | null;
+  studentsCount?: number;
+  adminsCount?: number;
+  createdAt: string;
+  status: string;
+};
+
+
 export default function SuperAdminSchools() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [schools, setSchools] = useState([]);
+  const [schools, setSchools] = useState<SchoolItem[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -54,14 +68,14 @@ export default function SuperAdminSchools() {
   loadSchools();
 }, []);
   // Filter schools based on search
-  const filteredSchools = schools.filter((s) => {
+  const filteredSchools = schools.filter((s: SchoolItem) => {
   const q = search.toLowerCase();
-
   const name = s.name?.toLowerCase() || "";
   const code = s.schoolCode?.toLowerCase() || "";
-
   return name.includes(q) || code.includes(q);
 });
+
+
 
 
 
