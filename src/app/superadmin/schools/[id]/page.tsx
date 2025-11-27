@@ -119,41 +119,8 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
   const [students, setStudents] = useState<any[]>([]);
 
 
-  const exams = useMemo(
-    () => [
-      {
-        code: "EX-2310-OBJ",
-        title: "General Nursing (Objective)",
-        type: "Objective",
-        mode: "ONLINE",
-        status: "LIVE",
-        students: 312,
-        start: "2025-10-08",
-        end: "2025-10-08",
-      },
-      {
-        code: "EX-2311-THY",
-        title: "Anatomy Essay I",
-        type: "Theory",
-        mode: "OFFLINE",
-        status: "CLOSED",
-        students: 124,
-        start: "2025-09-20",
-        end: "2025-09-20",
-      },
-      {
-        code: "EX-2312-PRC",
-        title: "Practical Lab Check",
-        type: "Practical",
-        mode: "ONLINE",
-        status: "APPROVED",
-        students: 98,
-        start: "2025-11-02",
-        end: "2025-11-02",
-      },
-    ],
-    []
-  );
+  const [exams, setExams] = useState<any[]>([]);
+
 
   const results = useMemo(
     () => [
@@ -245,6 +212,20 @@ export default function SchoolDetailsPage({ params }: { params: { id: string } }
 
 
   loadSchool();
+}, [id]);
+
+
+useEffect(() => {
+  async function loadExams() {
+    try {
+      const data = await fetchJSON(`/api/superadmin/schools/${id}/exams`);
+      setExams(data.exams || []);
+    } catch (error) {
+      console.error("Failed to load exams:", error);
+    }
+  }
+
+  loadExams();
 }, [id]);
 
 
