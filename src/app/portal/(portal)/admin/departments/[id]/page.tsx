@@ -279,63 +279,65 @@ export default function DepartmentStudentsPage() {
             className="rounded-2xl border border-white/10 bg-white/[0.03] shadow-lg overflow-hidden"
           >
             <div className="w-full overflow-x-auto rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-xl">
-              <table className="min-w-full text-sm">
-                <thead className="bg-white/[0.04] text-white/70">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Name</th>
-                    <th className="px-4 py-3 text-left">Admission No</th>
-                    <th className="px-4 py-3 text-left">Roll Number</th>
-                    <th className="px-4 py-3 text-left">Level / Class</th>
-                    <th className="px-4 py-3 text-left">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((stu, idx) => (
-                    <tr
-                      key={stu.id}
-                      className={`border-t border-white/5 ${
-                        idx % 2 === 0 ? "bg-white/[0.01]" : "bg-transparent"
-                      }`}
-                    >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="h-7 w-7 rounded-full bg-white/10 grid place-items-center text-[10px]">
-                            {stu.firstName?.[0]}
-                            {stu.lastName?.[0]}
-                          </div>
-                          <div>
-                            <p className="font-medium text-white">
-                              {stu.firstName} {stu.lastName}
-                            </p>
-                            <p className="text-[11px] text-white/50">{stu.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-white/80">
-                        {stu.admissionNo || "-"}
-                      </td>
-                      <td className="px-4 py-3 text-white/80">
-                        {stu.rollNumber || "-"}
-                      </td>
-                      <td className="px-4 py-3 text-white/70">
-                        {stu.level || stu.class || "-"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                            stu.status === "active"
-                              ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
-                              : "bg-amber-500/10 text-amber-200 border border-amber-500/30"
-                          }`}
-                        >
-                          {stu.status || "pending"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+  <div className="min-w-[640px] md:min-w-0"> {/* Force min-width on mobile */}
+    <table className="w-full text-sm">
+      <thead className="bg-white/[0.04] text-white/70">
+        <tr>
+          <th className="px-4 py-3 text-left">Name</th>
+          <th className="px-4 py-3 text-left">Admission No</th>
+          <th className="px-4 py-3 text-left">Roll Number</th>
+          <th className="px-4 py-3 text-left">Level / Class</th>
+          <th className="px-4 py-3 text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {students.map((stu, idx) => (
+          <tr
+            key={stu.id}
+            className={`border-t border-white/5 ${
+              idx % 2 === 0 ? "bg-white/[0.01]" : "bg-transparent"
+            }`}
+          >
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-full bg-white/10 grid place-items-center text-[10px]">
+                  {stu.firstName?.[0]}
+                  {stu.lastName?.[0]}
+                </div>
+                <div className="min-w-[120px]">
+                  <p className="font-medium text-white">
+                    {stu.firstName} {stu.lastName}
+                  </p>
+                  <p className="text-[11px] text-white/50 truncate">{stu.email}</p>
+                </div>
+              </div>
+            </td>
+            <td className="px-4 py-3 text-white/80 min-w-[100px]">
+              {stu.admissionNo || "-"}
+            </td>
+            <td className="px-4 py-3 text-white/80 min-w-[90px]">
+              {stu.rollNumber || "-"}
+            </td>
+            <td className="px-4 py-3 text-white/70 min-w-[100px]">
+              {stu.level || stu.class || "-"}
+            </td>
+            <td className="px-4 py-3 min-w-[90px]">
+              <span
+                className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                  stu.status === "active"
+                    ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                    : "bg-amber-500/10 text-amber-200 border border-amber-500/30"
+                }`}
+              >
+                {stu.status || "pending"}
+              </span>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
           </motion.div>
         )}
       </main>
