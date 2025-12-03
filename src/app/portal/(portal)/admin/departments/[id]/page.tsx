@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -15,7 +15,11 @@ import {
   X,
   School,
   ArrowLeft,
-  Building2, 
+  Building2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,6 +35,11 @@ export default function DepartmentStudentsPage() {
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Search and pagination states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (!departmentId) return;
@@ -77,6 +86,34 @@ export default function DepartmentStudentsPage() {
 
     loadDepartment();
   }, [departmentId]);
+
+  // Filter students based on search term
+  const filteredStudents = useMemo(() => {
+    if (!searchTerm) return students;
+    
+    const term = searchTerm.toLowerCase();
+    return students.filter(student => 
+      student.firstName?.toLowerCase().includes(term) ||
+      student.lastName?.toLowerCase().includes(term) ||
+      student.email?.toLowerCase().includes(term) ||
+      student.admissionNo?.toLowerCase().includes(term) ||
+      student.rollNumber?.toLowerCase().includes(term) ||
+      (student.level || student.class || "").toLowerCase().includes(term)
+    );
+  }, [students, searchTerm]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentStudents = filteredStudents.slice(startIndex, endIndex);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   /* ---------------- Skeleton / Error ---------------- */
   if (loading) {
@@ -205,7 +242,7 @@ export default function DepartmentStudentsPage() {
       </aside>
 
       {/* === MAIN CONTENT === */}
-      <main className="flex-1 md:ml-64 px-6 py-6 relative">
+      <main className="flex-1 md:ml-64 px-4 sm:px-6 py-6 relative">
         {/* BACKGROUND GLOW */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-10 right-10 h-56 w-56 rounded-full bg-blue-700/10 blur-3xl" />
@@ -267,77 +304,232 @@ export default function DepartmentStudentsPage() {
           </div>
         </div>
 
-        {/* STUDENTS TABLE / LIST */}
-        {students.length === 0 ? (
+        {/* SEARCH AND FILTER BAR */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40" size={18} />
+              <input
+                type="text"
+                placeholder="Search students by name, email, admission no, roll number..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg text-sm text-white placeholder-white/40 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Reset to first page when searching
+                }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button className="px-4 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg text-sm text-white/70 hover:text-white hover:border-white/20 flex items-center gap-2">
+                <Filter size={16} />
+                Filter
+              </button>
+            </div>
+          </div>
+          
+          {/* Search results info */}
+          {searchTerm && (
+            <div className="mt-3 text-sm text-white/60">
+              Found {filteredStudents.length} student{filteredStudents.length === 1 ? '' : 's'} matching "{searchTerm}"
+            </div>
+          )}
+        </div>
+
+        {/* STUDENTS CARD LIST WITH PAGINATION */}
+        {currentStudents.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/20 bg-white/[0.02] p-8 text-center text-white/60 text-sm">
-            No students found in this department yet.
+            {searchTerm ? 'No students found matching your search.' : 'No students found in this department yet.'}
           </div>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] shadow-lg overflow-hidden"
+            className="space-y-4"
           >
-            <div className="w-full overflow-x-auto rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-xl">
-  <div className="min-w-[640px] md:min-w-0"> {/* Force min-width on mobile */}
-    <table className="w-full text-sm">
-      <thead className="bg-white/[0.04] text-white/70">
-        <tr>
-          <th className="px-4 py-3 text-left">Name</th>
-          <th className="px-4 py-3 text-left">Admission No</th>
-          <th className="px-4 py-3 text-left">Roll Number</th>
-          <th className="px-4 py-3 text-left">Level / Class</th>
-          <th className="px-4 py-3 text-left">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {students.map((stu, idx) => (
-          <tr
-            key={stu.id}
-            className={`border-t border-white/5 ${
-              idx % 2 === 0 ? "bg-white/[0.01]" : "bg-transparent"
-            }`}
-          >
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-full bg-white/10 grid place-items-center text-[10px]">
-                  {stu.firstName?.[0]}
-                  {stu.lastName?.[0]}
-                </div>
-                <div className="min-w-[120px]">
-                  <p className="font-medium text-white">
-                    {stu.firstName} {stu.lastName}
-                  </p>
-                  <p className="text-[11px] text-white/50 truncate">{stu.email}</p>
+            {/* Desktop Table View (hidden on mobile) */}
+            <div className="hidden md:block">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-white/[0.04] text-white/70">
+                      <tr>
+                        <th className="px-4 py-3 text-left">Name</th>
+                        <th className="px-4 py-3 text-left">Admission No</th>
+                        <th className="px-4 py-3 text-left">Roll Number</th>
+                        <th className="px-4 py-3 text-left">Level / Class</th>
+                        <th className="px-4 py-3 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentStudents.map((stu, idx) => (
+                        <tr
+                          key={stu.id}
+                          className={`border-t border-white/5 ${
+                            idx % 2 === 0 ? "bg-white/[0.01]" : "bg-transparent"
+                          }`}
+                        >
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <div className="h-7 w-7 rounded-full bg-white/10 grid place-items-center text-[10px]">
+                                {stu.firstName?.[0]}
+                                {stu.lastName?.[0]}
+                              </div>
+                              <div className="min-w-[120px]">
+                                <p className="font-medium text-white">
+                                  {stu.firstName} {stu.lastName}
+                                </p>
+                                <p className="text-[11px] text-white/50 truncate">{stu.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-white/80 min-w-[100px]">
+                            {stu.admissionNo || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-white/80 min-w-[90px]">
+                            {stu.rollNumber || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-white/70 min-w-[100px]">
+                            {stu.level || stu.class || "-"}
+                          </td>
+                          <td className="px-4 py-3 min-w-[90px]">
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                                stu.status === "active"
+                                  ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                                  : "bg-amber-500/10 text-amber-200 border border-amber-500/30"
+                              }`}
+                            >
+                              {stu.status || "pending"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </td>
-            <td className="px-4 py-3 text-white/80 min-w-[100px]">
-              {stu.admissionNo || "-"}
-            </td>
-            <td className="px-4 py-3 text-white/80 min-w-[90px]">
-              {stu.rollNumber || "-"}
-            </td>
-            <td className="px-4 py-3 text-white/70 min-w-[100px]">
-              {stu.level || stu.class || "-"}
-            </td>
-            <td className="px-4 py-3 min-w-[90px]">
-              <span
-                className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                  stu.status === "active"
-                    ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
-                    : "bg-amber-500/10 text-amber-200 border border-amber-500/30"
-                }`}
-              >
-                {stu.status || "pending"}
-              </span>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+            </div>
+
+            {/* Mobile Card View (shown on mobile) */}
+            <div className="md:hidden space-y-3">
+              {currentStudents.map((stu) => (
+                <div
+                  key={stu.id}
+                  className="rounded-lg border border-white/10 bg-white/[0.02] p-4"
+                >
+                  {/* Header with name and status */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-white/10 grid place-items-center text-sm">
+                        {stu.firstName?.[0]}
+                        {stu.lastName?.[0]}
+                      </div>
+                      <div>
+                        <p className="font-medium text-white">
+                          {stu.firstName} {stu.lastName}
+                        </p>
+                        <p className="text-sm text-white/50">{stu.email}</p>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+                        stu.status === "active"
+                          ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                          : "bg-amber-500/10 text-amber-200 border border-amber-500/30"
+                      }`}
+                    >
+                      {stu.status || "pending"}
+                    </span>
+                  </div>
+
+                  {/* Details grid */}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-white/60 text-xs">Admission No</p>
+                      <p className="text-white/90">{stu.admissionNo || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-xs">Roll Number</p>
+                      <p className="text-white/90">{stu.rollNumber || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-xs">Level / Class</p>
+                      <p className="text-white/90">{stu.level || stu.class || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* PAGINATION */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-white/10">
+                <div className="text-sm text-white/60">
+                  Showing {startIndex + 1} to {Math.min(endIndex, filteredStudents.length)} of {filteredStudents.length} students
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-white/10 bg-white/[0.03] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/[0.05]"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  
+                  {/* Page numbers */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`w-8 h-8 rounded-lg text-sm ${
+                            currentPage === pageNum
+                              ? "bg-blue-600 text-white border border-blue-500"
+                              : "border border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    
+                    {totalPages > 5 && currentPage < totalPages - 2 && (
+                      <>
+                        <span className="text-white/30">...</span>
+                        <button
+                          onClick={() => handlePageChange(totalPages)}
+                          className={`w-8 h-8 rounded-lg text-sm border border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]`}
+                        >
+                          {totalPages}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-white/10 bg-white/[0.03] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/[0.05]"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </main>
