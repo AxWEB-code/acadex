@@ -57,22 +57,6 @@ export default function SuperAdminDashboardPage() {
       pill: "Security & Monitoring",
     },
     {
-      title: "Schools Management",
-      desc: "Onboard schools, manage plans, and control access to AcadeX.",
-      icon: Building2,
-      href: "/superadmin/schools",
-      accent: "from-slate-300/30 to-slate-500/10",
-      pill: "Multi-School",
-    },
-    {
-      title: "Admin Accounts",
-      desc: "Create and manage super admins, school admins and future invigilators.",
-      icon: Users,
-      href: "/superadmin/admins",
-      accent: "from-indigo-400/30 to-blue-500/10",
-      pill: "Access Control",
-    },
-    {
       title: "Exam Tokens & Access Keys",
       desc: "Generate secure tokens that invigilators use to access live exams.",
       icon: Key,

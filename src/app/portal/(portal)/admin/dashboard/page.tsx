@@ -24,22 +24,44 @@ export default function AdminDashboardAltLayout() {
   const [school, setSchool] = useState<any>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    // Simulate data loading
-    const timeout = setTimeout(() => {
-      setSchool({
-        name: "AcadeX University",
-        logo: "/acadex-logo.png",
-        subdomain: "adxuni",
-        totalStudents: 320,
-        totalDepartments: 5,
-        activeExams: 3,
-        pendingApprovals: 12,
-      });
-    }, 2000);
+ useEffect(() => {
+  const stored = localStorage.getItem("acadexUser");
+  if (!stored) return;
 
-    return () => clearTimeout(timeout);
-  }, []);
+  const user = JSON.parse(stored);
+  const schoolId = user.school?.id || user.admin?.schoolId;
+
+  console.log("🔍 acadexUser:", user);
+  console.log("🔍 schoolId:", schoolId);
+  console.log("🔍 API BASE:", process.env.NEXT_PUBLIC_API_URL);
+
+  if (!schoolId) {
+    console.warn("❌ No schoolId found in acadexUser");
+    return;
+  }
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"; // fallback
+
+  // Fetch real school info
+  fetch(`${baseUrl}/api/schools/${schoolId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("✅ School data:", data);
+      setSchool({
+        name: data.name,
+        logo: data.logo,
+        subdomain: data.subdomain,
+        totalStudents: data.totalStudents || 0,
+        totalDepartments: data.totalDepartments || 0,
+        activeExams: data.activeExams || 0,
+        pendingApprovals: data.pendingApprovals || 0,
+      });
+    })
+    .catch((err) => console.error("Failed loading school:", err));
+}, []);
+
+
 
   /* ---------------- Skeleton Loader ---------------- */
   if (!school)
