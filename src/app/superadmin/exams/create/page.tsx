@@ -307,41 +307,49 @@ export default function CreateExamPage() {
   };
 
   const handleSubmit = async () => {
-  setSubmitting(true);
+    setSubmitting(true);
 
-  try {
-    const API = process.env.NEXT_PUBLIC_API_URL;
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL;
 
-    const payload = { basic, papers, settings, notes };
+      // FIX: Read token from acadexUser
+      const storedUser = localStorage.getItem("acadexUser");
+      const token = storedUser ? JSON.parse(storedUser).token : null;
 
-    const res = await fetch(`${API}/api/superadmin/exams/publish`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      if (!token) {
+        alert("You are not logged in. Please log in again.");
+        return;
+      }
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error("Exam creation error:", err);
-      alert("Failed to create exam!");
-      return;
+      const payload = { basic, papers, settings, notes };
+
+      const res = await fetch(`${API}/api/exams/publish`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ send correct token
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error("Exam creation error:", err);
+        alert("Failed to create exam!");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Exam created:", data);
+
+      router.push("/superadmin/exams");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create exam.");
+    } finally {
+      setSubmitting(false);
     }
-
-    const data = await res.json();
-    console.log("Exam created:", data);
-
-    router.push("/superadmin/exams");
-
-  } catch (err) {
-    console.error(err);
-    alert("Failed to create exam.");
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  };
 
   // Progress percentage
   const progress = (step / TOTAL_STEPS) * 100;
@@ -504,8 +512,8 @@ export default function CreateExamPage() {
                         done
                           ? "border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
                           : active
-                          ? "border-blue-500/70 bg-blue-500/10 text-blue-200"
-                          : "border-white/10 bg-white/[0.03] text-white/50"
+                            ? "border-blue-500/70 bg-blue-500/10 text-blue-200"
+                            : "border-white/10 bg-white/[0.03] text-white/50"
                       )}
                     >
                       {done ? (
@@ -661,8 +669,8 @@ export default function CreateExamPage() {
                     {basic.semester === "FIRST"
                       ? "1st Semester"
                       : basic.semester === "SECOND"
-                      ? "2nd Semester"
-                      : "Not set"}
+                        ? "2nd Semester"
+                        : "Not set"}
                   </span>
                 </p>
                 <p className="text-xs text-white/50">
@@ -754,6 +762,57 @@ function Step1Basics({
   schools: School[];
   departments: Department[];
 }) {
+  const API = process.env.NEXT_PUBLIC_API_URL;
+
+  // Function to check if exam code exists
+  async function validateExamCode(code: string) {
+    try {
+      const res = await fetch(`${API}/api/exams/check-code?code=${code}`);
+      const { exists } = await res.json();
+      return exists;
+    } catch (err) {
+      console.error("Failed checking exam code", err);
+      return false;
+    }
+  }
+
+  // Automatic code validation whenever it changes
+  useEffect(() => {
+    async function run() {
+      if (!basic.code) return;
+
+      const exists = await validateExamCode(basic.code);
+      if (exists) {
+        // regenerate and set new unique code
+        let newCode = generateExamCode();
+        let tries = 0;
+
+        while (await validateExamCode(newCode)) {
+          newCode = generateExamCode();
+          tries++;
+
+          if (tries > 5) break; // safety break
+        }
+
+        setBasic((prev) => ({ ...prev, code: newCode }));
+        alert("Exam code already exists — regenerated automatically.");
+      }
+    }
+
+    run();
+  }, [basic.code]);
+
+  // Function to handle manual refresh
+  const handleRefreshCode = async () => {
+    let newCode = generateExamCode();
+
+    while (await validateExamCode(newCode)) {
+      newCode = generateExamCode();
+    }
+
+    setBasic((prev) => ({ ...prev, code: newCode }));
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-sm font-semibold mb-1">
@@ -804,8 +863,8 @@ function Step1Basics({
                   !basic.schoolId
                     ? "Select school first"
                     : departments.length === 0
-                    ? "No department found"
-                    : "Select department"
+                      ? "No department found"
+                      : "Select department"
                 }
               />
             </SelectTrigger>
@@ -864,17 +923,26 @@ function Step1Basics({
         <div className="space-y-1">
           <label className="text-xs text-white/70">Exam Code *</label>
           <div className="flex items-center gap-2 bg-white/[0.03] border border-white/15 rounded-md px-3 py-2 text-xs">
-  <span className="flex-1 text-white/80">{basic.code || "Generating..."}</span>
+            <span className="flex-1 text-white/80">
+              {basic.code || "Generating..."}
+            </span>
 
-  <button
-    type="button"
-    onClick={() => navigator.clipboard.writeText(basic.code)}
-    className="text-blue-300 hover:text-blue-200"
-  >
-    Copy
-  </button>
-</div>
+            <button
+              type="button"
+              onClick={handleRefreshCode}
+              className="text-blue-300 hover:text-blue-200"
+            >
+              Refresh
+            </button>
 
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(basic.code)}
+              className="text-blue-300 hover:text-blue-200"
+            >
+              Copy
+            </button>
+          </div>
         </div>
 
         <div className="space-y-1">
@@ -1274,66 +1342,63 @@ function Step3Questions({
   };
 
   const handleObjUpload = async (paperId: number, file: File | null) => {
-  if (!file) return;
+    if (!file) return;
 
-  try {
-   const API = process.env.NEXT_PUBLIC_API_URL;
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL;
 
-    const formData = new FormData();
-formData.append("file", file);
+      const formData = new FormData();
+      formData.append("file", file);
 
-const res = await fetch(`${API}/api/superadmin/exams/parse-obj`, {
-  method: "POST",
-  body: formData,
-});
+      const res = await fetch(`${API}/api/superadmin/exams/parse-obj`, {
+        method: "POST",
+        body: formData,
+      });
 
-    if (!res.ok) {
-      alert("Failed to parse OBJ file (API error).");
-      return;
+      if (!res.ok) {
+        alert("Failed to parse OBJ file (API error).");
+        return;
+      }
+
+      const data = await res.json();
+      const parsedQuestions = data.questions || [];
+      const warnings = data.warnings || [];
+
+      // 🔥 FIXED UPDATE LOGIC
+      setPapers((prev) =>
+        prev.map((p) => {
+          if (p.id !== paperId) return p;
+
+          const formatted = parsedQuestions.map((q: any, i: number) => ({
+            id: i + 1,
+            text: q.text,
+            optionA: q.optionA,
+            optionB: q.optionB,
+            optionC: q.optionC,
+            optionD: q.optionD,
+            optionE: q.optionE,
+            correct: q.correct,
+            marks: "",
+          }));
+
+          if (p.type === "PRACTICAL") {
+            return { ...p, practicalObjQuestions: formatted };
+          }
+
+          return { ...p, objectiveQuestions: formatted };
+        })
+      );
+
+      if (warnings.length) {
+        alert("Parsed with warnings:\n" + warnings.slice(0, 5).join("\n"));
+      } else {
+        alert(`Loaded ${parsedQuestions.length} questions successfully!`);
+      }
+    } catch (err) {
+      console.error("OBJ upload error:", err);
+      alert("Unexpected error while uploading file.");
     }
-
-    const data = await res.json();
-    const parsedQuestions = data.questions || [];
-    const warnings = data.warnings || [];
-
-    // 🔥 FIXED UPDATE LOGIC
-    setPapers((prev) =>
-      prev.map((p) => {
-        if (p.id !== paperId) return p;
-
-        const formatted = parsedQuestions.map((q: any, i: number) => ({
-          id: i + 1,
-          text: q.text,
-          optionA: q.optionA,
-          optionB: q.optionB,
-          optionC: q.optionC,
-          optionD: q.optionD,
-          optionE: q.optionE,
-          correct: q.correct,
-          marks: "",
-        }));
-
-        if (p.type === "PRACTICAL") {
-          return { ...p, practicalObjQuestions: formatted };
-        }
-
-        return { ...p, objectiveQuestions: formatted };
-      })
-    );
-
-    if (warnings.length) {
-      alert("Parsed with warnings:\n" + warnings.slice(0, 5).join("\n"));
-    } else {
-      alert(`Loaded ${parsedQuestions.length} questions successfully!`);
-    }
-  } catch (err) {
-    console.error("OBJ upload error:", err);
-    alert("Unexpected error while uploading file.");
-  }
-};
-
-
-
+  };
 
   return (
     <div className="space-y-4">
@@ -1364,166 +1429,166 @@ const res = await fetch(`${API}/api/superadmin/exams/parse-obj`, {
             {(paper.type === "OBJECTIVE" ||
               paper.type === "MIXED" ||
               paper.type === "PRACTICAL") && (
-              <div className="space-y-3">
-                <p className="text-[11px] text-white/60 font-medium">
-                  Objective Questions{" "}
-                  {paper.type === "PRACTICAL" && "(Linked to practical)"}
-                </p>
+                <div className="space-y-3">
+                  <p className="text-[11px] text-white/60 font-medium">
+                    Objective Questions{" "}
+                    {paper.type === "PRACTICAL" && "(Linked to practical)"}
+                  </p>
 
-                {/* Upload block */}
-                <div className="rounded-lg border border-dashed border-white/20 bg-white/[0.02] p-3 text-[11px] text-white/60 flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-3 h-3" />
-                    <span>
-                      Upload OBJ file (Word / CSV / Excel) to auto-generate
-                      questions (backend parsing later).
-                    </span>
+                  {/* Upload block */}
+                  <div className="rounded-lg border border-dashed border-white/20 bg-white/[0.02] p-3 text-[11px] text-white/60 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Upload className="w-3 h-3" />
+                      <span>
+                        Upload OBJ file (Word / CSV / Excel) to auto-generate
+                        questions (backend parsing later).
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      name="file"
+                      accept=".csv,.xlsx,.xls,.docx,.txt"
+                      onChange={(e) => handleObjUpload(paper.id, e.target.files?.[0] || null)}
+                    />
+
                   </div>
-                  <input
-  type="file"
-  name="file"
-  accept=".csv,.xlsx,.xls,.docx,.txt"
-  onChange={(e) => handleObjUpload(paper.id, e.target.files?.[0] || null)}
-/>
 
-                </div>
-
-                {/* Manual builder */}
-                <div className="space-y-2">
-                  {(
-                    (paper.type === "PRACTICAL"
-                      ? paper.practicalObjQuestions
-                      : paper.objectiveQuestions) || []
-                  ).map((q) => (
-                    <div
-                      key={q.id}
-                      className="rounded-lg border border-white/10 bg-white/[0.04] p-3 space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="text-[11px] text-white/70">
-                          Question {q.id}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleRemoveObjective(
+                  {/* Manual builder */}
+                  <div className="space-y-2">
+                    {(
+                      (paper.type === "PRACTICAL"
+                        ? paper.practicalObjQuestions
+                        : paper.objectiveQuestions) || []
+                    ).map((q) => (
+                      <div
+                        key={q.id}
+                        className="rounded-lg border border-white/10 bg-white/[0.04] p-3 space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-[11px] text-white/70">
+                            Question {q.id}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveObjective(
+                                paper.id,
+                                q.id,
+                                paper.type === "PRACTICAL"
+                              )
+                            }
+                            className="text-rose-300 hover:text-rose-200 text-[11px] flex items-center gap-1"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Remove
+                          </button>
+                        </div>
+                        <Input
+                          value={q.text}
+                          onChange={(e) =>
+                            handleObjectiveChange(
                               paper.id,
                               q.id,
+                              "text",
+                              e.target.value,
                               paper.type === "PRACTICAL"
                             )
                           }
-                          className="text-rose-300 hover:text-rose-200 text-[11px] flex items-center gap-1"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                          Remove
-                        </button>
-                      </div>
-                      <Input
-                        value={q.text}
-                        onChange={(e) =>
-                          handleObjectiveChange(
-                            paper.id,
-                            q.id,
-                            "text",
-                            e.target.value,
-                            paper.type === "PRACTICAL"
-                          )
-                        }
-                        placeholder="Question text"
-                        className="bg-white/[0.03] border-white/15 text-xs"
-                      />
-                      <div className="grid sm:grid-cols-2 gap-2 text-[11px]">
-                        {["A", "B", "C", "D", "E"].map((opt) => {
-                          const field =
-                            ("option" + opt) as keyof ObjectiveQuestion;
-                          return (
+                          placeholder="Question text"
+                          className="bg-white/[0.03] border-white/15 text-xs"
+                        />
+                        <div className="grid sm:grid-cols-2 gap-2 text-[11px]">
+                          {["A", "B", "C", "D", "E"].map((opt) => {
+                            const field =
+                              ("option" + opt) as keyof ObjectiveQuestion;
+                            return (
+                              <Input
+                                key={opt}
+                                value={q[field] as string}
+                                onChange={(e) =>
+                                  handleObjectiveChange(
+                                    paper.id,
+                                    q.id,
+                                    field,
+                                    e.target.value,
+                                    paper.type === "PRACTICAL"
+                                  )
+                                }
+                                placeholder={`Option ${opt}`}
+                                className="bg-white/[0.03] border-white/15 text-xs"
+                              />
+                            );
+                          })}
+                        </div>
+                        <div className="flex flex-wrap gap-2 items-center text-[11px]">
+                          <div className="flex items-center gap-1">
+                            <span className="text-white/60">
+                              Correct option:
+                            </span>
+                            <Select
+                              value={q.correct}
+                              onValueChange={(value) =>
+                                handleObjectiveChange(
+                                  paper.id,
+                                  q.id,
+                                  "correct",
+                                  value as ObjectiveQuestion["correct"],
+                                  paper.type === "PRACTICAL"
+                                )
+                              }
+                            >
+                              <SelectTrigger className="h-7 w-24 bg-white/[0.03] border-white/15 text-[11px]">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {["A", "B", "C", "D", "E"].map((opt) => (
+                                  <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-white/60">Marks:</span>
                             <Input
-                              key={opt}
-                              value={q[field] as string}
+                              type="number"
+                              min={0}
+                              value={q.marks}
                               onChange={(e) =>
                                 handleObjectiveChange(
                                   paper.id,
                                   q.id,
-                                  field,
+                                  "marks",
                                   e.target.value,
                                   paper.type === "PRACTICAL"
                                 )
                               }
-                              placeholder={`Option ${opt}`}
-                              className="bg-white/[0.03] border-white/15 text-xs"
+                              className="h-7 w-20 bg-white/[0.03] border-white/15 text-[11px]"
                             />
-                          );
-                        })}
-                      </div>
-                      <div className="flex flex-wrap gap-2 items-center text-[11px]">
-                        <div className="flex items-center gap-1">
-                          <span className="text-white/60">
-                            Correct option:
-                          </span>
-                          <Select
-                            value={q.correct}
-                            onValueChange={(value) =>
-                              handleObjectiveChange(
-                                paper.id,
-                                q.id,
-                                "correct",
-                                value as ObjectiveQuestion["correct"],
-                                paper.type === "PRACTICAL"
-                              )
-                            }
-                          >
-                            <SelectTrigger className="h-7 w-24 bg-white/[0.03] border-white/15 text-[11px]">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {["A", "B", "C", "D", "E"].map((opt) => (
-                                <SelectItem key={opt} value={opt}>
-                                  {opt}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-white/60">Marks:</span>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={q.marks}
-                            onChange={(e) =>
-                              handleObjectiveChange(
-                                paper.id,
-                                q.id,
-                                "marks",
-                                e.target.value,
-                                paper.type === "PRACTICAL"
-                              )
-                            }
-                            className="h-7 w-20 bg-white/[0.03] border-white/15 text-[11px]"
-                          />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
 
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="border-dashed border-white/25 bg-white/[0.02] text-[11px]"
-                    onClick={() =>
-                      handleAddObjectiveQuestion(
-                        paper.id,
-                        paper.type === "PRACTICAL"
-                      )
-                    }
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add objective question
-                  </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="border-dashed border-white/25 bg-white/[0.02] text-[11px]"
+                      onClick={() =>
+                        handleAddObjectiveQuestion(
+                          paper.id,
+                          paper.type === "PRACTICAL"
+                        )
+                      }
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add objective question
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* THEORY */}
             {(paper.type === "THEORY" || paper.type === "MIXED") && (
@@ -1775,8 +1840,8 @@ function Step5Review({
                 basic.semester === "FIRST"
                   ? "1st Semester"
                   : basic.semester === "SECOND"
-                  ? "2nd Semester"
-                  : "—"
+                    ? "2nd Semester"
+                    : "—"
               }
             />
             <Row label="Mode" value={basic.mode || "—"} />
@@ -1793,8 +1858,8 @@ function Step5Review({
               value={
                 basic.startDate || basic.endDate
                   ? `${basic.startDate || "?"} → ${
-                      basic.endDate || "?"
-                    }`
+                    basic.endDate || "?"
+                  }`
                   : "—"
               }
             />
